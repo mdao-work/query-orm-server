@@ -35,7 +35,7 @@ class QueryClient
      * @param mixed ...$value
      * @return $this
      */
-    public function whereIn(string $key, ...$value)
+    public function whereIn(string $key, ...$value): QueryClient
     {
         $this->parserEntity->setFilter([(new QueryFilter($key, 'in', $value))->toArray()]);
         return $this;
@@ -57,7 +57,7 @@ class QueryClient
      * @param array $value
      * @return $this
      */
-    public function whereNoBetween(string $key, string $value)
+    public function whereNoBetween(string $key, string $value): QueryClient
     {
         $this->parserEntity->setFilter([(new QueryFilter($key, 'not between', $value))->toArray()]);
         return $this;
@@ -68,7 +68,7 @@ class QueryClient
      * @param string $direction
      * @return $this
      */
-    public function orderBy(string $key, string $direction = 'desc')
+    public function orderBy(string $key, string $direction = 'desc'): QueryClient
     {
         $queryOrderBy = (new QueryOrderBy($key, $direction));
         $this->parserEntity->setOrder([[$queryOrderBy->getColumn(), $queryOrderBy->getDirection()]]);
@@ -79,29 +79,18 @@ class QueryClient
      * @param array $select
      * @return $this
      */
-    public function select(array $select)
+    public function select(array $select): QueryClient
     {
         $this->parserEntity->setSelect((new QuerySelect($select))->toArray());
         return $this;
     }
-
-    // /**
-    //  * @param mixed ...$with
-    //  * @return $this
-    //  */
-    // public function with(...$with)
-    // {
-    //     $with = Arr::flatten($with);
-    //     $this->setQueryWith(new QueryWith($with));
-    //     return $this;
-    // }
 
     /**
      * @param int $perPage
      * @param int $page
      * @return $this
      */
-    public function page(int $perPage, int $page = 10)
+    public function page(int $perPage, int $page = 10): QueryClient
     {
         $queryPagination = (new QueryPagination($page, $perPage));
         $this->parserEntity->setPagination([$queryPagination->getPage(), $queryPagination->getPerPage()]);
