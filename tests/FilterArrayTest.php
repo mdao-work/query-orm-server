@@ -1,11 +1,11 @@
 <?php
 
-namespace mdao\QueryOrm\Test;
+namespace mdao\QueryOrmServer\Test;
 
-use mdao\QueryOrm\Exception\ParserException;
+use mdao\QueryOrmServer\Exception\ParserException;
 use \PHPUnit\Framework\TestCase;
-use mdao\QueryOrm\Servers\QueryServer;
-use mdao\QueryOrm\Entities\OrmEntity;
+use mdao\QueryOrmServer\Servers\QueryServer;
+use mdao\QueryOrmServer\Entities\OrmEntity;
 
 class FilterArrayTest extends TestCase
 {
@@ -18,7 +18,7 @@ class FilterArrayTest extends TestCase
             'filter' => [],
         ];
         $queryServer = new QueryServer(OrmEntity::createEntity($data));
-        $this->assertNull($queryServer->getQueryFilter());
+        $this->assertNull($queryServer->getQueryWheres());
     }
 
     /**
@@ -44,17 +44,16 @@ class FilterArrayTest extends TestCase
 
         $queryServer = new QueryServer(OrmEntity::createEntity($data));
         //验证表达式
-        $this->assertEquals('=', $queryServer->getQueryFilter()[0]->toArray()[1]);
-        $this->assertEquals('<>', $queryServer->getQueryFilter()[1]->toArray()[1]);
-        $this->assertEquals('>', $queryServer->getQueryFilter()[2]->toArray()[1]);
-        $this->assertEquals('>=', $queryServer->getQueryFilter()[3]->toArray()[1]);
-        $this->assertEquals('<', $queryServer->getQueryFilter()[4]->toArray()[1]);
-        $this->assertEquals('<=', $queryServer->getQueryFilter()[5]->toArray()[1]);
-        $this->assertEquals('like', $queryServer->getQueryFilter()[6]->toArray()[1]);
-        $this->assertEquals('in', $queryServer->getQueryFilter()[7]->toArray()[1]);
-        $this->assertEquals('between', $queryServer->getQueryFilter()[8]->toArray()[1]);
-        $this->assertEquals('=', $queryServer->getQueryFilter()[9]->toArray()[1]);
-
+        $this->assertEquals('=', $queryServer->getQueryWheres()[0]->toArray()[1]);
+        $this->assertEquals('<>', $queryServer->getQueryWheres()[1]->toArray()[1]);
+        $this->assertEquals('>', $queryServer->getQueryWheres()[2]->toArray()[1]);
+        $this->assertEquals('>=', $queryServer->getQueryWheres()[3]->toArray()[1]);
+        $this->assertEquals('<', $queryServer->getQueryWheres()[4]->toArray()[1]);
+        $this->assertEquals('<=', $queryServer->getQueryWheres()[5]->toArray()[1]);
+        $this->assertEquals('like', $queryServer->getQueryWheres()[6]->toArray()[1]);
+        $this->assertEquals('in', $queryServer->getQueryWheres()[7]->toArray()[1]);
+        $this->assertEquals('between', $queryServer->getQueryWheres()[8]->toArray()[1]);
+        $this->assertEquals('=', $queryServer->getQueryWheres()[9]->toArray()[1]);
     }
 
     /**
@@ -80,16 +79,16 @@ class FilterArrayTest extends TestCase
 
         $queryServer = new QueryServer(OrmEntity::createEntity($data));
         //验证表达式
-        $this->assertEquals('created_at_1', $queryServer->getQueryFilter()[0]->toArray()[0]);
-        $this->assertEquals('created_at_2', $queryServer->getQueryFilter()[1]->toArray()[0]);
-        $this->assertEquals('created_at_3', $queryServer->getQueryFilter()[2]->toArray()[0]);
-        $this->assertEquals('created_at_4', $queryServer->getQueryFilter()[3]->toArray()[0]);
-        $this->assertEquals('created_at_5', $queryServer->getQueryFilter()[4]->toArray()[0]);
-        $this->assertEquals('created_at_6', $queryServer->getQueryFilter()[5]->toArray()[0]);
-        $this->assertEquals('created_at_7', $queryServer->getQueryFilter()[6]->toArray()[0]);
-        $this->assertEquals('created_at_8', $queryServer->getQueryFilter()[7]->toArray()[0]);
-        $this->assertEquals('created_at_9', $queryServer->getQueryFilter()[8]->toArray()[0]);
-        $this->assertEquals('created_at_10', $queryServer->getQueryFilter()[9]->toArray()[0]);
+        $this->assertEquals('created_at_1', $queryServer->getQueryWheres()[0]->toArray()[0]);
+        $this->assertEquals('created_at_2', $queryServer->getQueryWheres()[1]->toArray()[0]);
+        $this->assertEquals('created_at_3', $queryServer->getQueryWheres()[2]->toArray()[0]);
+        $this->assertEquals('created_at_4', $queryServer->getQueryWheres()[3]->toArray()[0]);
+        $this->assertEquals('created_at_5', $queryServer->getQueryWheres()[4]->toArray()[0]);
+        $this->assertEquals('created_at_6', $queryServer->getQueryWheres()[5]->toArray()[0]);
+        $this->assertEquals('created_at_7', $queryServer->getQueryWheres()[6]->toArray()[0]);
+        $this->assertEquals('created_at_8', $queryServer->getQueryWheres()[7]->toArray()[0]);
+        $this->assertEquals('created_at_9', $queryServer->getQueryWheres()[8]->toArray()[0]);
+        $this->assertEquals('created_at_10', $queryServer->getQueryWheres()[9]->toArray()[0]);
     }
 
     /**
@@ -115,16 +114,15 @@ class FilterArrayTest extends TestCase
 
         $queryServer = new QueryServer(OrmEntity::createEntity($data));
         //验证表达式
-        $this->assertEquals('=', $queryServer->getQueryFilter()[0]->toArray()[2]);
-        $this->assertEquals('<>', $queryServer->getQueryFilter()[1]->toArray()[2]);
-        $this->assertEquals('>', $queryServer->getQueryFilter()[2]->toArray()[2]);
-        $this->assertEquals('>=', $queryServer->getQueryFilter()[3]->toArray()[2]);
-        $this->assertEquals('<', $queryServer->getQueryFilter()[4]->toArray()[2]);
-        $this->assertEquals('<=', $queryServer->getQueryFilter()[5]->toArray()[2]);
-        $this->assertEquals('like', $queryServer->getQueryFilter()[6]->toArray()[2]);
-        $this->assertEquals('in', $queryServer->getQueryFilter()[7]->toArray()[2]);
-        $this->assertEquals('between', $queryServer->getQueryFilter()[8]->toArray()[2]);
-        $this->assertEquals('=', $queryServer->getQueryFilter()[9]->toArray()[2]);
-
+        $this->assertEquals('=', $queryServer->getQueryWheres()[0]->toArray()[2]);
+        $this->assertEquals('<>', $queryServer->getQueryWheres()[1]->toArray()[2]);
+        $this->assertEquals('>', $queryServer->getQueryWheres()[2]->toArray()[2]);
+        $this->assertEquals('>=', $queryServer->getQueryWheres()[3]->toArray()[2]);
+        $this->assertEquals('<', $queryServer->getQueryWheres()[4]->toArray()[2]);
+        $this->assertEquals('<=', $queryServer->getQueryWheres()[5]->toArray()[2]);
+        $this->assertEquals('like', $queryServer->getQueryWheres()[6]->toArray()[2]);
+        $this->assertEquals('in', $queryServer->getQueryWheres()[7]->toArray()[2]);
+        $this->assertEquals('between', $queryServer->getQueryWheres()[8]->toArray()[2]);
+        $this->assertEquals('=', $queryServer->getQueryWheres()[9]->toArray()[2]);
     }
 }

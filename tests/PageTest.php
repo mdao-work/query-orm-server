@@ -1,14 +1,13 @@
 <?php
 
-namespace mdao\QueryOrm\Test;
+namespace mdao\QueryOrmServer\Test;
 
 use \PHPUnit\Framework\TestCase;
-use mdao\QueryOrm\Servers\QueryServer;
-use mdao\QueryOrm\Entities\OrmEntity;
+use mdao\QueryOrmServer\Servers\QueryServer;
+use mdao\QueryOrmServer\Entities\OrmEntity;
 
 class PageTest extends TestCase
 {
-
     public function testParserEmpty()
     {
         $queryServer = new QueryServer(OrmEntity::createEntity([]));
@@ -59,5 +58,4 @@ class PageTest extends TestCase
             'page_size' => 50,
         ], $queryServer->getQueryPagination()->toArray());
     }
-
 }

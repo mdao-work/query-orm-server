@@ -1,9 +1,9 @@
 <?php
 
 
-namespace mdao\QueryOrm\Entities;
+namespace mdao\QueryOrmServer\Entities;
 
-use mdao\QueryOrm\Contracts\Arrayable;
+use mdao\QueryOrmServer\Contracts\Arrayable;
 
 class QueryOrderBy implements Arrayable
 {

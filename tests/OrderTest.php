@@ -1,11 +1,11 @@
 <?php
 
-namespace mdao\QueryOrm\Test;
+namespace mdao\QueryOrmServer\Test;
 
-use mdao\QueryOrm\Exception\ParserException;
+use mdao\QueryOrmServer\Exception\ParserException;
 use \PHPUnit\Framework\TestCase;
-use mdao\QueryOrm\Servers\QueryServer;
-use mdao\QueryOrm\Entities\OrmEntity;
+use mdao\QueryOrmServer\Servers\QueryServer;
+use mdao\QueryOrmServer\Entities\OrmEntity;
 
 class OrderTest extends TestCase
 {
@@ -24,7 +24,6 @@ class OrderTest extends TestCase
      */
     public function testParserDesc()
     {
-
         $url = "https://www.baidu.com?order_by=id&sorted_by=desc";
         //1.0 用parse_url解析URL
         $data = parse_url($url);

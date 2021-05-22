@@ -9,4 +9,4 @@ do
 done
 
 #  ./vendor/bin/phpunit --configuration ./phpunit.xml --filter FilterUrlTest
-#  ./vendor/bin/phpunit --configuration ./phpunit.xml --filter FilterUrlTest
+#  ./vendor/bin/phpunit --configuration ./phpunit.xml --filter FiltersTest

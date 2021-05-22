@@ -1,13 +1,13 @@
 <?php
 
 
-namespace mdao\QueryOrm;
+namespace mdao\QueryOrmServer;
 
-use mdao\QueryOrm\Entities\QueryFilter;
-use mdao\QueryOrm\Entities\ParserEntity;
-use mdao\QueryOrm\Entities\QueryOrderBy;
-use mdao\QueryOrm\Entities\QuerySelect;
-use mdao\QueryOrm\Entities\QueryPagination;
+use mdao\QueryOrmServer\Entities\QueryWhere;
+use mdao\QueryOrmServer\Entities\ParserEntity;
+use mdao\QueryOrmServer\Entities\QueryOrderBy;
+use mdao\QueryOrmServer\Entities\QuerySelect;
+use mdao\QueryOrmServer\Entities\QueryPagination;
 
 class QueryClient
 {
@@ -26,7 +26,7 @@ class QueryClient
      */
     public function where(string $key, string $operation, $value = null)
     {
-        $this->parserEntity->setFilter([(new QueryFilter($key, $operation, $value))->toArray()]);
+        $this->parserEntity->setFilter([(new QueryWhere($key, $operation, $value))->toArray()]);
         return $this;
     }
 
@@ -37,7 +37,7 @@ class QueryClient
      */
     public function whereIn(string $key, ...$value): QueryClient
     {
-        $this->parserEntity->setFilter([(new QueryFilter($key, 'in', $value))->toArray()]);
+        $this->parserEntity->setFilter([(new QueryWhere($key, 'in', $value))->toArray()]);
         return $this;
     }
 
@@ -48,7 +48,7 @@ class QueryClient
      */
     public function whereBetween(string $key, string $value)
     {
-        $this->parserEntity->setFilter([(new QueryFilter($key, 'between', $value))->toArray()]);
+        $this->parserEntity->setFilter([(new QueryWhere($key, 'between', $value))->toArray()]);
         return $this;
     }
 
@@ -59,7 +59,7 @@ class QueryClient
      */
     public function whereNoBetween(string $key, string $value): QueryClient
     {
-        $this->parserEntity->setFilter([(new QueryFilter($key, 'not between', $value))->toArray()]);
+        $this->parserEntity->setFilter([(new QueryWhere($key, 'not between', $value))->toArray()]);
         return $this;
     }
 

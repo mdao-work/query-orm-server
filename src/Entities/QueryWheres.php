@@ -1,56 +1,29 @@
 <?php
 
 
-namespace mdao\QueryOrm\Entities;
+namespace mdao\QueryOrmServer\Entities;
 
+use Exception;
 use InvalidArgumentException;
+use Traversable;
 
-class QueryFilters implements \JsonSerializable, \ArrayAccess
+class QueryWheres implements \JsonSerializable, \ArrayAccess, \Iterator, \Countable
 {
     // 数据信息
     protected $data = [];
     // 当前类名称
     protected $class;
 
-    /*
-   * 初始化过的模型.
-   *
-   * @var array
-   */
-    protected static $initialized = [];
 
     /**
      * 构造方法
      * @access public
      * @param array|object $data 数据
      */
-    public function __construct($data = [])
+    public function __construct(array $data = [])
     {
         $this->filters($data);
-        $this->initialize();
-    }
-
-    /**
-     *  初始化模型
-     * @access protected
-     * @return void
-     */
-    protected function initialize()
-    {
-        $class = get_class($this);
-        if (!isset(static::$initialized[$class])) {
-            static::$initialized[$class] = true;
-            static::init();
-        }
-    }
-
-    /**
-     * 初始化处理
-     * @access protected
-     * @return void
-     */
-    protected static function init()
-    {
+        $this->class = static::class;
     }
 
     /**
@@ -70,11 +43,9 @@ class QueryFilters implements \JsonSerializable, \ArrayAccess
      */
     public function filters(array $items = []): self
     {
-        foreach ($items as $filter) {
-            foreach ($filter as $value) {
-                list($field, $operator, $value) = $value;
-                $this->data[$field] = new QueryFilter($field, $operator, $value);
-            }
+        foreach ($items as $value) {
+            list($field, $operator, $value) = $value;
+            $this->data[$field] = new QueryWhere($field, $operator, $value);
         }
         return $this;
     }
@@ -88,7 +59,6 @@ class QueryFilters implements \JsonSerializable, \ArrayAccess
         return new self($items);
     }
 
-
     /**
      * 获取对象原始数据 如果不存在指定字段返回false
      * @access public
@@ -96,14 +66,14 @@ class QueryFilters implements \JsonSerializable, \ArrayAccess
      * @return mixed
      * @throws InvalidArgumentException
      */
-    public function getData($name = null): QueryFilter
+    public function getData($name = null): ?QueryWhere
     {
         if (is_null($name)) {
             return $this->data;
         } elseif (array_key_exists($name, $this->data)) {
             return $this->data[$name];
         } else {
-            throw new InvalidArgumentException('property not exists:' . $this->class . '->' . $name);
+            return null;
         }
     }
 
@@ -114,7 +84,23 @@ class QueryFilters implements \JsonSerializable, \ArrayAccess
      */
     public function toArray()
     {
-        return !empty($item) ? $item : [];
+        if (empty($this->data)) {
+            return [];
+        }
+
+        $list = [];
+        /**
+         * @var $queryWhere QueryWhere
+         */
+        foreach ($this->data as $queryWhere) {
+            $list[$queryWhere->getField()] = [
+                'field' => $queryWhere->getField(),
+                'operator' => $queryWhere->getOperator(),
+                'value' => $queryWhere->getValue(),
+            ];
+        }
+
+        return $list;
     }
 
     /**
@@ -125,7 +111,7 @@ class QueryFilters implements \JsonSerializable, \ArrayAccess
      */
     public function toJson($options = JSON_UNESCAPED_UNICODE)
     {
-        return json_encode($this->toArray(), $options);
+        return json_encode(array_values($this->toArray()), $options);
     }
 
     /**
@@ -137,7 +123,7 @@ class QueryFilters implements \JsonSerializable, \ArrayAccess
      */
     public function __set($name, $value)
     {
-        $this->setAttr($name, $value);
+        $this->setFilter($name, $value);
     }
 
     /**
@@ -169,7 +155,6 @@ class QueryFilters implements \JsonSerializable, \ArrayAccess
         } catch (InvalidArgumentException $e) {
             return false;
         }
-
     }
 
     /**
@@ -212,15 +197,40 @@ class QueryFilters implements \JsonSerializable, \ArrayAccess
 
     public function offsetGet($name)
     {
-        return $this->setFilter($name);
+        if (is_numeric($name)) {
+            $data = array_values($this->data);
+            return !isset($data[$name]) ? null : $data[$name];
+        }
+        return $this->getData($name);
     }
 
-    /**
-     * 解序列化后处理
-     */
-    public function __wakeup()
+    public function count()
     {
-        $this->initialize();
+        return count($this->data);
     }
 
+    public function rewind()
+    {
+        reset($this->data);
+    }
+
+    public function current()
+    {
+        return current($this->data);
+    }
+
+    public function key()
+    {
+        return key($this->data);
+    }
+
+    public function next()
+    {
+        return next($this->data);
+    }
+
+    public function valid()
+    {
+        return ($this->current() !== false);
+    }
 }

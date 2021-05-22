@@ -1,11 +1,11 @@
 <?php
 
 
-namespace mdao\QueryOrm\Entities;
+namespace mdao\QueryOrmServer\Entities;
 
-use mdao\QueryOrm\Contracts\Arrayable;
+use mdao\QueryOrmServer\Contracts\Arrayable;
 
-class QueryFilter implements Arrayable
+class QueryWhere implements Arrayable
 {
     /**
      * @var string
@@ -22,7 +22,7 @@ class QueryFilter implements Arrayable
     protected $value;
 
     /**
-     * QueryFilter constructor.
+     * QueryWhere constructor.
      * @param string $field
      * @param string $operator
      * @param string|array|int $value

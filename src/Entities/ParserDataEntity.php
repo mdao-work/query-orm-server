@@ -1,9 +1,9 @@
 <?php
 
 
-namespace mdao\QueryOrm\Entities;
+namespace mdao\QueryOrmServer\Entities;
 
-use mdao\QueryOrm\Contracts\ParserEntityContract;
+use mdao\QueryOrmServer\Contracts\ParserEntityContract;
 
 class ParserDataEntity implements ParserEntityContract
 {
