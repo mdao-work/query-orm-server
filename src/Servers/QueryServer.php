@@ -6,6 +6,7 @@ namespace mdao\QueryOrmServer\Servers;
 use mdao\QueryOrmServer\Contracts\OrmEntityContract;
 use mdao\QueryOrmServer\Contracts\QueryServerContract;
 use mdao\QueryOrmServer\Entities\ParserDataEntity;
+use mdao\QueryOrmServer\Entities\QueryWhereOrs;
 use mdao\QueryOrmServer\Entities\QueryWheres;
 use mdao\QueryOrmServer\Entities\QueryOrderBy;
 use mdao\QueryOrmServer\Entities\QueryPagination;
@@ -37,6 +38,17 @@ class QueryServer implements QueryServerContract
                 'filter' => $this->ormEntity->getFilter()
             ])->getFilter();
 
+            return empty($result) ? null : $result;
+        }
+        return null;
+    }
+
+    public function getQueryWhereOrs(): ?QueryWhereOrs
+    {
+        if ($result = $this->ormEntity->getWhereOr()) {
+            $result = $this->parser->apply($this->parserDataEntity, [
+                'where_or' => $this->ormEntity->getWhereOr()
+            ])->getWhereOr();
             return empty($result) ? null : $result;
         }
         return null;

@@ -7,7 +7,7 @@ use \PHPUnit\Framework\TestCase;
 use mdao\QueryOrmServer\Servers\QueryServer;
 use mdao\QueryOrmServer\Entities\OrmEntity;
 
-class FilterArrayTest extends TestCase
+class WhereArrayTest extends TestCase
 {
     /**
      * @throws ParserException

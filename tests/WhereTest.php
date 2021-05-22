@@ -8,7 +8,7 @@ use mdao\QueryOrmServer\Entities\QueryWheres;
 use mdao\QueryOrmServer\Servers\QueryServer;
 use mdao\QueryOrmServer\Entities\OrmEntity;
 
-class FiltersTest extends TestCase
+class WhereTest extends TestCase
 {
 
     /**

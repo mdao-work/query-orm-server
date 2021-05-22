@@ -7,7 +7,7 @@ use \PHPUnit\Framework\TestCase;
 use mdao\QueryOrmServer\Servers\QueryServer;
 use mdao\QueryOrmServer\Entities\OrmEntity;
 
-class FilterUrlTest extends TestCase
+class WhereUrlTest extends TestCase
 {
     /**
      * @throws ParserException
