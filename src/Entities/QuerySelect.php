@@ -1,9 +1,9 @@
 <?php
 
 
-namespace mdao\QueryOrm\Entities;
+namespace mdao\QueryOrmServer\Entities;
 
-use mdao\QueryOrm\Contracts\Arrayable;
+use mdao\QueryOrmServer\Contracts\Arrayable;
 
 class QuerySelect implements Arrayable
 {
@@ -11,14 +11,14 @@ class QuerySelect implements Arrayable
      * 查询字段
      * @var array
      */
-    protected $select = ['*'];
+    protected $select = [];
 
     /**
      * @var array
      */
     private $alias = [];
 
-    public function __construct(array $select = ['*'])
+    public function __construct(array $select = [])
     {
         $this->setSelect($select);
         foreach ($select as $index => $item) {
@@ -102,4 +102,5 @@ class QuerySelect implements Arrayable
     {
         return $this->getSelect();
     }
+
 }

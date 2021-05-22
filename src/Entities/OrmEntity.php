@@ -1,9 +1,9 @@
 <?php
 
 
-namespace mdao\QueryOrm\Entities;
+namespace mdao\QueryOrmServer\Entities;
 
-use mdao\QueryOrm\Contracts\OrmEntityContract;
+use mdao\QueryOrmServer\Contracts\OrmEntityContract;
 
 class OrmEntity implements OrmEntityContract
 {
@@ -31,7 +31,7 @@ class OrmEntity implements OrmEntityContract
     /**
      * @var string
      */
-    protected $select = '*';
+    protected $select = '';
 
     /**
      * OrmEntity constructor.
@@ -48,7 +48,7 @@ class OrmEntity implements OrmEntityContract
         string $sortedBy = null,
         ?int $page = null,
         ?int $pageSize = null,
-        string $select = '*'
+        string $select = ''
     ) {
         $this->filter = $filter;
         $this->orderBy = $orderBy;
@@ -70,7 +70,7 @@ class OrmEntity implements OrmEntityContract
         $sortedBy = $attributes['sorted_by'] ?? null;
         $page = $attributes['page'] ?? null;
         $pageSize = $attributes['page_size'] ?? null;
-        $select = $attributes['select'] ?? '*';
+        $select = $attributes['select'] ?? '';
         return new static($filter, $orderBy, $sortedBy, $page, $pageSize, $select);
     }
 

@@ -1,10 +1,10 @@
 <?php
 
 
-namespace mdao\QueryOrm\Contracts;
+namespace mdao\QueryOrmServer\Contracts;
 
-use mdao\QueryOrm\Entities\QueryPagination;
-use mdao\QueryOrm\Entities\QuerySelect;
+use mdao\QueryOrmServer\Entities\QueryPagination;
+use mdao\QueryOrmServer\Entities\QuerySelect;
 
 interface ParserEntityContract
 {

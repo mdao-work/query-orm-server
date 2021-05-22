@@ -1,19 +1,17 @@
 <?php
 
 
-namespace mdao\QueryOrm\Servers;
+namespace mdao\QueryOrmServer\Servers;
 
-use mdao\QueryOrm\Contracts\OrmEntityContract;
-use mdao\QueryOrm\Contracts\QueryServerContract;
-use mdao\QueryOrm\Entities\OrmEntity;
-use mdao\QueryOrm\Entities\ParserDataEntity;
-use mdao\QueryOrm\Entities\ParserEntity;
-use mdao\QueryOrm\Entities\QueryFilter;
-use mdao\QueryOrm\Entities\QueryOrderBy;
-use mdao\QueryOrm\Entities\QueryPagination;
-use mdao\QueryOrm\Entities\QuerySelect;
-use mdao\QueryOrm\Exception\ParserException;
-use mdao\QueryOrm\Parser;
+use mdao\QueryOrmServer\Contracts\OrmEntityContract;
+use mdao\QueryOrmServer\Contracts\QueryServerContract;
+use mdao\QueryOrmServer\Entities\ParserDataEntity;
+use mdao\QueryOrmServer\Entities\QueryWheres;
+use mdao\QueryOrmServer\Entities\QueryOrderBy;
+use mdao\QueryOrmServer\Entities\QueryPagination;
+use mdao\QueryOrmServer\Entities\QuerySelect;
+use mdao\QueryOrmServer\Exception\ParserException;
+use mdao\QueryOrmServer\Parser;
 
 class QueryServer implements QueryServerContract
 {
@@ -29,15 +27,17 @@ class QueryServer implements QueryServerContract
     }
 
     /**
-     * @return array
+     * @return QueryWheres
      * @throws ParserException
      */
-    public function getQueryFilter(): ?array
+    public function getQueryWheres(): ?QueryWheres
     {
         if ($result = $this->ormEntity->getFilter()) {
-            return $this->parser->apply($this->parserDataEntity, [
+            $result = $this->parser->apply($this->parserDataEntity, [
                 'filter' => $this->ormEntity->getFilter()
             ])->getFilter();
+
+            return empty($result) ? null : $result;
         }
         return null;
     }

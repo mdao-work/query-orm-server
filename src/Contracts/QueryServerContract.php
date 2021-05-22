@@ -1,12 +1,13 @@
 <?php
 
 
-namespace mdao\QueryOrm\Contracts;
+namespace mdao\QueryOrmServer\Contracts;
 
-use mdao\QueryOrm\Entities\QueryFilter;
-use mdao\QueryOrm\Entities\QueryOrderBy;
-use mdao\QueryOrm\Entities\QueryPagination;
-use mdao\QueryOrm\Entities\QuerySelect;
+use mdao\QueryOrmServer\Entities\QueryWhere;
+use mdao\QueryOrmServer\Entities\QueryWheres;
+use mdao\QueryOrmServer\Entities\QueryOrderBy;
+use mdao\QueryOrmServer\Entities\QueryPagination;
+use mdao\QueryOrmServer\Entities\QuerySelect;
 
 interface QueryServerContract
 {
@@ -14,7 +15,7 @@ interface QueryServerContract
      * 条件
      * @return array|null
      */
-    public function getQueryFilter(): ?array;
+    public function getQueryWheres(): ?QueryWheres;
 
     /**
      * 排序

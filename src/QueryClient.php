@@ -1,13 +1,13 @@
 <?php
 
 
-namespace mdao\QueryOrm;
+namespace mdao\QueryOrmServer;
 
-use mdao\QueryOrm\Entities\QueryFilter;
-use mdao\QueryOrm\Entities\ParserEntity;
-use mdao\QueryOrm\Entities\QueryOrderBy;
-use mdao\QueryOrm\Entities\QuerySelect;
-use mdao\QueryOrm\Entities\QueryPagination;
+use mdao\QueryOrmServer\Entities\QueryWhere;
+use mdao\QueryOrmServer\Entities\ParserEntity;
+use mdao\QueryOrmServer\Entities\QueryOrderBy;
+use mdao\QueryOrmServer\Entities\QuerySelect;
+use mdao\QueryOrmServer\Entities\QueryPagination;
 
 class QueryClient
 {
@@ -26,7 +26,7 @@ class QueryClient
      */
     public function where(string $key, string $operation, $value = null)
     {
-        $this->parserEntity->setFilter([(new QueryFilter($key, $operation, $value))->toArray()]);
+        $this->parserEntity->setFilter([(new QueryWhere($key, $operation, $value))->toArray()]);
         return $this;
     }
 
@@ -35,9 +35,9 @@ class QueryClient
      * @param mixed ...$value
      * @return $this
      */
-    public function whereIn(string $key, ...$value)
+    public function whereIn(string $key, ...$value): QueryClient
     {
-        $this->parserEntity->setFilter([(new QueryFilter($key, 'in', $value))->toArray()]);
+        $this->parserEntity->setFilter([(new QueryWhere($key, 'in', $value))->toArray()]);
         return $this;
     }
 
@@ -48,7 +48,7 @@ class QueryClient
      */
     public function whereBetween(string $key, string $value)
     {
-        $this->parserEntity->setFilter([(new QueryFilter($key, 'between', $value))->toArray()]);
+        $this->parserEntity->setFilter([(new QueryWhere($key, 'between', $value))->toArray()]);
         return $this;
     }
 
@@ -57,9 +57,9 @@ class QueryClient
      * @param array $value
      * @return $this
      */
-    public function whereNoBetween(string $key, string $value)
+    public function whereNoBetween(string $key, string $value): QueryClient
     {
-        $this->parserEntity->setFilter([(new QueryFilter($key, 'not between', $value))->toArray()]);
+        $this->parserEntity->setFilter([(new QueryWhere($key, 'not between', $value))->toArray()]);
         return $this;
     }
 
@@ -68,7 +68,7 @@ class QueryClient
      * @param string $direction
      * @return $this
      */
-    public function orderBy(string $key, string $direction = 'desc')
+    public function orderBy(string $key, string $direction = 'desc'): QueryClient
     {
         $queryOrderBy = (new QueryOrderBy($key, $direction));
         $this->parserEntity->setOrder([[$queryOrderBy->getColumn(), $queryOrderBy->getDirection()]]);
@@ -79,32 +79,21 @@ class QueryClient
      * @param array $select
      * @return $this
      */
-    public function select(array $select)
+    public function select(array $select): QueryClient
     {
         $this->parserEntity->setSelect((new QuerySelect($select))->toArray());
         return $this;
     }
 
-    // /**
-    //  * @param mixed ...$with
-    //  * @return $this
-    //  */
-    // public function with(...$with)
-    // {
-    //     $with = Arr::flatten($with);
-    //     $this->setQueryWith(new QueryWith($with));
-    //     return $this;
-    // }
-
     /**
-     * @param int $perPage
+     * @param int $pageSize
      * @param int $page
      * @return $this
      */
-    public function page(int $perPage, int $page = 10)
+    public function page(int $pageSize, int $page = 10): QueryClient
     {
-        $queryPagination = (new QueryPagination($page, $perPage));
-        $this->parserEntity->setPagination([$queryPagination->getPage(), $queryPagination->getPerPage()]);
+        $queryPagination = (new QueryPagination($page, $pageSize));
+        $this->parserEntity->setPagination([$queryPagination->getPage(), $queryPagination->getPageSize()]);
         return $this;
     }
 

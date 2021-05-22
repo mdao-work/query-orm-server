@@ -1,8 +1,8 @@
 <?php
 
-namespace mdao\QueryOrm\Entities;
+namespace mdao\QueryOrmServer\Entities;
 
-use mdao\QueryOrm\Contracts\Arrayable;
+use mdao\QueryOrmServer\Contracts\Arrayable;
 
 /**
  * 指定分页
@@ -18,17 +18,17 @@ class QueryPagination implements Arrayable
      * 每页数量
      * @var int
      */
-    protected $perPage = 15;
+    protected $pageSize = 15;
 
     /**
      * QueryPagination constructor.
      * @param int $page
-     * @param int $perPage
+     * @param int $pageSize
      */
-    public function __construct(int $page = 1, int $perPage = 15)
+    public function __construct(int $page = 1, int $pageSize = 15)
     {
         $this->setPage($page);
-        $this->setPerPage($perPage);
+        $this->setPageSize($pageSize);
     }
 
 
@@ -51,17 +51,17 @@ class QueryPagination implements Arrayable
     /**
      * @return int
      */
-    public function getPerPage(): int
+    public function getPageSize(): int
     {
-        return $this->perPage;
+        return $this->pageSize;
     }
 
     /**
-     * @param int $perPage
+     * @param int $PageSize
      */
-    public function setPerPage(int $perPage): void
+    public function setPageSize(int $pageSize): void
     {
-        $this->perPage = $perPage;
+        $this->pageSize = $pageSize;
     }
 
     /**
@@ -71,7 +71,7 @@ class QueryPagination implements Arrayable
     {
         return [
             'page' => $this->getPage(),
-            'page_size' => $this->getPerPage(),
+            'page_size' => $this->getPageSize(),
         ];
     }
 }

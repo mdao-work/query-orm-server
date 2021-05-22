@@ -1,11 +1,11 @@
 <?php
 
 
-namespace mdao\QueryOrm;
+namespace mdao\QueryOrmServer;
 
-use mdao\QueryOrm\Exception\ParserException;
-use mdao\QueryOrm\Entities\ParserEntity;
-use mdao\QueryOrm\Contracts\ParserEntityContract;
+use mdao\QueryOrmServer\Exception\ParserException;
+use mdao\QueryOrmServer\Entities\ParserEntity;
+use mdao\QueryOrmServer\Contracts\ParserEntityContract;
 
 class Parser
 {
@@ -20,6 +20,7 @@ class Parser
 
     /**
      * @param ParserEntityContract $parserEntityContract
+     * @param $param
      * @return ParserEntity
      * @throws ParserException
      */

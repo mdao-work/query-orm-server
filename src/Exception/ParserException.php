@@ -1,7 +1,7 @@
 <?php
 
 
-namespace mdao\QueryOrm\Exception;
+namespace mdao\QueryOrmServer\Exception;
 
 use Exception;
 

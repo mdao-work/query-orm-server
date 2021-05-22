@@ -1,9 +1,9 @@
 <?php
 
 
-namespace mdao\QueryOrm\Entities;
+namespace mdao\QueryOrmServer\Entities;
 
-use mdao\QueryOrm\Contracts\Arrayable;
+use mdao\QueryOrmServer\Contracts\Arrayable;
 
 class ParserEntity implements Arrayable
 {
@@ -14,7 +14,7 @@ class ParserEntity implements Arrayable
     protected $select;
 
     /**
-     * @var array
+     * @var QueryWheres
      */
     protected $filter;
     /**
@@ -43,9 +43,8 @@ class ParserEntity implements Arrayable
         $this->setSelect($select);
     }
 
-
     /**
-     * @return mixed
+     * @return QueryWheres
      */
     public function getFilter()
     {
@@ -58,10 +57,7 @@ class ParserEntity implements Arrayable
      */
     public function setFilter(array $filter): self
     {
-        foreach ($filter as $value) {
-            list($field, $operator, $value) = $value;
-            $this->filter[] = new QueryFilter($field, $operator, $value);
-        }
+        $this->filter= QueryWheres::createFilters($filter);
         return $this;
     }
 
@@ -125,7 +121,6 @@ class ParserEntity implements Arrayable
      */
     public function setSelect(array $select): self
     {
-
         $this->select = new QuerySelect($select);
 
         return $this;
@@ -139,14 +134,7 @@ class ParserEntity implements Arrayable
         $queries = [];
         if ($this->filter) {
             $filters = $this->getFilter();
-            $filterArray = [];
-            /**
-             * @var QueryFilter $filter
-             */
-            foreach ($filters as $filter) {
-                $filterArray[] = $filter[0]->toArray();
-            }
-            $queries['filter'] = $filterArray;
+            $queries['filter'] =$filters->toArray();
         }
         if ($this->order) {
             $orders = $this->getOrder();
@@ -184,14 +172,7 @@ class ParserEntity implements Arrayable
     {
         $queries = [];
         if ($this->filter) {
-            $queries['filter'] = [];
-            /**
-             * @var QueryFilter $queryItem
-             */
-            foreach ($this->getFilter() as $queryItem) {
-                $field = $queryItem->parserOperator();
-                $queries['filter'][$field] = $queryItem->getValue();
-            }
+            $queries['filter']= $this->getFilter()->toArray();
         }
 
         if ($this->select) {
@@ -214,7 +195,7 @@ class ParserEntity implements Arrayable
         }
         if ($this->pagination) {
             $queries['page'] = $this->getPagination()->getPage();
-            $queries['page_size'] = $this->getPagination()->getPerPage();
+            $queries['page_size'] = $this->getPagination()->getPageSize();
         }
         return http_build_query($queries);
     }

@@ -1,14 +1,13 @@
 <?php
 
-namespace mdao\QueryOrm\Test;
+namespace mdao\QueryOrmServer\Test;
 
 use \PHPUnit\Framework\TestCase;
-use mdao\QueryOrm\Servers\QueryServer;
-use mdao\QueryOrm\Entities\OrmEntity;
+use mdao\QueryOrmServer\Servers\QueryServer;
+use mdao\QueryOrmServer\Entities\OrmEntity;
 
 class PageTest extends TestCase
 {
-
     public function testParserEmpty()
     {
         $queryServer = new QueryServer(OrmEntity::createEntity([]));
@@ -60,4 +59,19 @@ class PageTest extends TestCase
         ], $queryServer->getQueryPagination()->toArray());
     }
 
+
+    public function testParserFunction()
+    {
+        $url = "https://www.baidu.com?page=19&page_size=50";
+        //1.0 用parse_url解析URL
+        $data = parse_url($url);
+        parse_str($data['query'], $arrQuery);
+
+        $queryServer = new QueryServer(OrmEntity::createEntity($arrQuery));
+        //验证表达式
+        $this->assertEquals([
+            'page' => $queryServer->getQueryPagination()->getPage(),
+            'page_size' => $queryServer->getQueryPagination()->getPageSize(),
+        ], $queryServer->getQueryPagination()->toArray());
+    }
 }

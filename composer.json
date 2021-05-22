@@ -22,12 +22,12 @@
   },
   "autoload": {
     "psr-4": {
-      "mdao\\QueryOrm\\": "src/"
+      "mdao\\QueryOrmServer\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "mdao\\QueryOrm\\Test\\": "tests/"
+      "mdao\\QueryOrmServer\\Test\\": "tests/"
     }
   },
   "scripts": {
