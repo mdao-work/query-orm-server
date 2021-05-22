@@ -17,6 +17,12 @@ class ParserEntity implements Arrayable
      * @var QueryWheres
      */
     protected $filter;
+
+    /**
+     * @var QueryWhereOrs
+     */
+    protected $whereOr;
+
     /**
      * @var array
      */
@@ -26,10 +32,19 @@ class ParserEntity implements Arrayable
      */
     protected $pagination;
 
-    public function __construct(array $filter = [], array $select = [], array $order = [], array $pagination = [])
-    {
+    public function __construct(
+        array $filter = [],
+        array $select = [],
+        array $order = [],
+        array $pagination = [],
+        array $whereOr = []
+    ) {
         if (!empty($filter)) {
             $this->setFilter($filter);
+        }
+
+        if (!empty($whereOr)) {
+            $this->setWhereOr($whereOr);
         }
 
         if (!empty($order)) {
@@ -61,6 +76,24 @@ class ParserEntity implements Arrayable
         return $this;
     }
 
+    /**
+     * @return QueryWhereOrs
+     */
+    public function getWhereOr()
+    {
+        return $this->whereOr;
+    }
+
+    /**
+     * @param array $filter
+     * @return $this
+     */
+    public function setWhereOr(array $filter): self
+    {
+        $this->whereOr= QueryWhereOrs::createFilters($filter);
+        return $this;
+    }
+    
     /**
      * @return array
      */

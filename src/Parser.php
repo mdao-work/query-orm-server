@@ -11,6 +11,7 @@ class Parser
 {
 
     protected $filter = 'filter';
+    protected $whereOr = 'where_or';
     protected $orderBy = 'order_by';
     protected $sortedBy = 'sorted_by';
     protected $page = 'page';
@@ -30,8 +31,11 @@ class Parser
         $params = $parserEntityContract->apply($param);
 
         $filter = $params[$this->filter] ?? [];
-
         $filter = $this->where($filter);
+
+        $whereOr = $params[$this->whereOr] ?? [];
+        $whereOr = $this->where($whereOr);
+
         $orderBy = $params[$this->orderBy] ?? 'id';
         $sortedBy = $params[$this->sortedBy] ?? 'desc';
         $order = [];
@@ -48,7 +52,7 @@ class Parser
         $select = trim($select, ',');
         $select = $this->select($select);
 
-        return new ParserEntity($filter, $select, $order, $pagination);
+        return new ParserEntity($filter, $select, $order, $pagination, $whereOr);
     }
 
     /**

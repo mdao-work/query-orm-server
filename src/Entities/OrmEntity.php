@@ -11,6 +11,12 @@ class OrmEntity implements OrmEntityContract
      * @var array
      */
     protected $filter = [];
+
+    /**
+     * @var array
+     */
+    protected $whereOr = [];
+
     /**
      * @var string|null
      */
@@ -35,22 +41,25 @@ class OrmEntity implements OrmEntityContract
 
     /**
      * OrmEntity constructor.
-     * @param array|null $filter
+     * @param array $filter
      * @param string|null $orderBy
      * @param string|null $sortedBy
      * @param int|null $page
      * @param int|null $pageSize
      * @param string $select
+     * @param array $whereOr
      */
     public function __construct(
-        array $filter = null,
+        array $filter = [],
         string $orderBy = null,
         string $sortedBy = null,
         ?int $page = null,
         ?int $pageSize = null,
-        string $select = ''
+        string $select = '',
+        array $whereOr = []
     ) {
         $this->filter = $filter;
+        $this->whereOr = $whereOr;
         $this->orderBy = $orderBy;
         $this->sortedBy = $sortedBy;
         $this->page = $page;
@@ -71,7 +80,8 @@ class OrmEntity implements OrmEntityContract
         $page = $attributes['page'] ?? null;
         $pageSize = $attributes['page_size'] ?? null;
         $select = $attributes['select'] ?? '';
-        return new static($filter, $orderBy, $sortedBy, $page, $pageSize, $select);
+        $whereOr = $attributes['where_or'] ?? [];
+        return new static($filter, $orderBy, $sortedBy, $page, $pageSize, $select, $whereOr);
     }
 
     /**
@@ -168,5 +178,15 @@ class OrmEntity implements OrmEntityContract
     public function setSelect($select): void
     {
         $this->select = $select;
+    }
+
+    public function getWhereOr(): array
+    {
+        return $this->whereOr;
+    }
+
+    public function setWhereOr(array $whereOr): void
+    {
+        $this->whereOr = $whereOr;
     }
 }

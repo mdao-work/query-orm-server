@@ -23,6 +23,16 @@ interface OrmEntityContract
     public function setFilter(array $filter): void;
 
     /**
+     * @return array
+     */
+    public function getWhereOr(): array;
+
+    /**
+     * @param array $filter
+     */
+    public function setWhereOr(array $filter): void;
+
+    /**
      * @return string
      */
     public function getOrderBy(): ?string;

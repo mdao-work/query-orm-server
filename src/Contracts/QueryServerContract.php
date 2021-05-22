@@ -3,9 +3,8 @@
 
 namespace mdao\QueryOrmServer\Contracts;
 
-use mdao\QueryOrmServer\Entities\QueryWhere;
+use mdao\QueryOrmServer\Entities\QueryWhereOrs;
 use mdao\QueryOrmServer\Entities\QueryWheres;
-use mdao\QueryOrmServer\Entities\QueryOrderBy;
 use mdao\QueryOrmServer\Entities\QueryPagination;
 use mdao\QueryOrmServer\Entities\QuerySelect;
 
@@ -16,6 +15,12 @@ interface QueryServerContract
      * @return array|null
      */
     public function getQueryWheres(): ?QueryWheres;
+
+    /**
+     * 条件
+     * @return array|null
+     */
+    public function getQueryWhereOrs(): ?QueryWhereOrs;
 
     /**
      * 排序

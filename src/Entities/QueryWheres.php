@@ -56,7 +56,7 @@ class QueryWheres implements \JsonSerializable, \ArrayAccess, \Iterator, \Counta
      */
     public static function createFilters(array $items = []): self
     {
-        return new self($items);
+        return new static($items);
     }
 
     /**
