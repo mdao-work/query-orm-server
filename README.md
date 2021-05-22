@@ -33,10 +33,20 @@ $queryServer->getQueryWheres()['id']->getValue();
 
 //获取select
 $queryServer->getQuerySelect();
+//查询的字段数组
+$queryServer->getQuerySelect()->toArray();
+
+
 //获取OrderBy
 $queryServer->getQueryOrderBy();
+
 //获取Pagination
 $queryServer->getQueryPagination();
+
+//获取当前第几页
+$queryServer->getQueryPagination()->getPage();
+//获取每页多少条
+$queryServer->getQueryPagination()->getPageSize();
 
 ```
 

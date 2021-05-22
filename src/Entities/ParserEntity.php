@@ -195,7 +195,7 @@ class ParserEntity implements Arrayable
         }
         if ($this->pagination) {
             $queries['page'] = $this->getPagination()->getPage();
-            $queries['page_size'] = $this->getPagination()->getPerPage();
+            $queries['page_size'] = $this->getPagination()->getPageSize();
         }
         return http_build_query($queries);
     }

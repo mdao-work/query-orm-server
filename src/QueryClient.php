@@ -86,14 +86,14 @@ class QueryClient
     }
 
     /**
-     * @param int $perPage
+     * @param int $pageSize
      * @param int $page
      * @return $this
      */
-    public function page(int $perPage, int $page = 10): QueryClient
+    public function page(int $pageSize, int $page = 10): QueryClient
     {
-        $queryPagination = (new QueryPagination($page, $perPage));
-        $this->parserEntity->setPagination([$queryPagination->getPage(), $queryPagination->getPerPage()]);
+        $queryPagination = (new QueryPagination($page, $pageSize));
+        $this->parserEntity->setPagination([$queryPagination->getPage(), $queryPagination->getPageSize()]);
         return $this;
     }
 

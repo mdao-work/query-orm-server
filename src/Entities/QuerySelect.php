@@ -102,4 +102,5 @@ class QuerySelect implements Arrayable
     {
         return $this->getSelect();
     }
+
 }

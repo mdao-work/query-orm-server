@@ -58,4 +58,20 @@ class PageTest extends TestCase
             'page_size' => 50,
         ], $queryServer->getQueryPagination()->toArray());
     }
+
+
+    public function testParserFunction()
+    {
+        $url = "https://www.baidu.com?page=19&page_size=50";
+        //1.0 用parse_url解析URL
+        $data = parse_url($url);
+        parse_str($data['query'], $arrQuery);
+
+        $queryServer = new QueryServer(OrmEntity::createEntity($arrQuery));
+        //验证表达式
+        $this->assertEquals([
+            'page' => $queryServer->getQueryPagination()->getPage(),
+            'page_size' => $queryServer->getQueryPagination()->getPageSize(),
+        ], $queryServer->getQueryPagination()->toArray());
+    }
 }
