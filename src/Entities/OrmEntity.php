@@ -75,12 +75,18 @@ class OrmEntity implements OrmEntityContract
     public static function createEntity($attributes)
     {
         $filter = $attributes['filter'] ?? [];
+        if (is_string($filter)) {
+            $filter=json_decode($filter, true);
+        }
         $orderBy = $attributes['order_by'] ?? null;
         $sortedBy = $attributes['sorted_by'] ?? null;
         $page = $attributes['page'] ?? null;
         $pageSize = $attributes['page_size'] ?? null;
         $select = $attributes['select'] ?? '';
         $whereOr = $attributes['where_or'] ?? [];
+        if (is_string($whereOr)) {
+            $whereOr=json_decode($whereOr, true);
+        }
         return new static($filter, $orderBy, $sortedBy, $page, $pageSize, $select, $whereOr);
     }
 
