@@ -87,6 +87,12 @@ class OrmEntity implements OrmEntityContract
         if (is_string($whereOr)) {
             $whereOr=json_decode($whereOr, true);
         }
+        if (is_array($orderBy)) {
+            $orderBy=implode(',', $orderBy);
+        }
+        if (is_array($sortedBy)) {
+            $sortedBy=implode(',', $sortedBy);
+        }
         return new static($filter, $orderBy, $sortedBy, $page, $pageSize, $select, $whereOr);
     }
 
