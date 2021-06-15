@@ -38,9 +38,9 @@ interface OrmEntityContract
     public function getOrderBy(): ?string;
 
     /**
-     * @param int $orderBy
+     * @param string $orderBy
      */
-    public function setOrderBy(int $orderBy): void;
+    public function setOrderBy(string $orderBy): void;
 
     /**
      * @return string
@@ -48,9 +48,9 @@ interface OrmEntityContract
     public function getSortedBy(): ?string;
 
     /**
-     * @param int $sortedBy
+     * @param string $sortedBy
      */
-    public function setSortedBy(int $sortedBy): void;
+    public function setSortedBy(string $sortedBy): void;
 
     /**
      * @return int
@@ -81,4 +81,5 @@ interface OrmEntityContract
      * @param mixed $select
      */
     public function setSelect($select): void;
+
 }

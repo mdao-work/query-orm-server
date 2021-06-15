@@ -121,9 +121,9 @@ class OrmEntity implements OrmEntityContract
     }
 
     /**
-     * @param int $orderBy
+     * @param string $orderBy
      */
-    public function setOrderBy(int $orderBy): void
+    public function setOrderBy(string $orderBy): void
     {
         $this->orderBy = $orderBy;
     }
@@ -137,9 +137,9 @@ class OrmEntity implements OrmEntityContract
     }
 
     /**
-     * @param int $sortedBy
+     * @param string $sortedBy
      */
-    public function setSortedBy(int $sortedBy): void
+    public function setSortedBy(string $sortedBy): void
     {
         $this->sortedBy = $sortedBy;
     }

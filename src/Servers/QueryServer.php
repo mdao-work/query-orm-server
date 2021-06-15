@@ -6,6 +6,7 @@ namespace mdao\QueryOrmServer\Servers;
 use mdao\QueryOrmServer\Contracts\OrmEntityContract;
 use mdao\QueryOrmServer\Contracts\QueryServerContract;
 use mdao\QueryOrmServer\Entities\ParserDataEntity;
+use mdao\QueryOrmServer\Entities\QueryWhere;
 use mdao\QueryOrmServer\Entities\QueryWhereOrs;
 use mdao\QueryOrmServer\Entities\QueryWheres;
 use mdao\QueryOrmServer\Entities\QueryOrderBy;
@@ -33,7 +34,7 @@ class QueryServer implements QueryServerContract
      */
     public function getQueryWheres(): ?QueryWheres
     {
-        if ($result = $this->ormEntity->getFilter()) {
+        if ($this->ormEntity->getFilter()) {
             $result = $this->parser->apply($this->parserDataEntity, [
                 'filter' => $this->ormEntity->getFilter()
             ])->getFilter();
@@ -45,7 +46,7 @@ class QueryServer implements QueryServerContract
 
     public function getQueryWhereOrs(): ?QueryWhereOrs
     {
-        if ($result = $this->ormEntity->getWhereOr()) {
+        if ($this->ormEntity->getWhereOr()) {
             $result = $this->parser->apply($this->parserDataEntity, [
                 'where_or' => $this->ormEntity->getWhereOr()
             ])->getWhereOr();
@@ -60,7 +61,7 @@ class QueryServer implements QueryServerContract
      */
     public function getQueryOrderBy(): ?array
     {
-        if ($result = $this->ormEntity->getOrderBy()) {
+        if ($this->ormEntity->getOrderBy()) {
             return $this->parser->apply($this->parserDataEntity, [
                 'order_by' => $this->ormEntity->getOrderBy(),
                 'sorted_by' => $this->ormEntity->getSortedBy(),
@@ -97,4 +98,87 @@ class QueryServer implements QueryServerContract
         }
         return null;
     }
+
+    /**
+     * @param string $key
+     * @param string $operation
+     * @param null $value
+     * @return $this
+     */
+    public function where(string $key, string $operation, $value = null): QueryServer
+    {
+        $this->ormEntity->setFilter([(new QueryWhere($key, $operation, $value))->toArray()]);
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed ...$value
+     * @return $this
+     */
+    public function whereIn(string $key, ...$value): QueryServer
+    {
+        $this->ormEntity->setFilter([(new QueryWhere($key, 'in', $value))->toArray()]);
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     * @return $this
+     */
+    public function whereBetween(string $key, string $value): QueryServer
+    {
+        $this->ormEntity->setFilter([(new QueryWhere($key, 'between', $value))->toArray()]);
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     * @return $this
+     */
+    public function whereNoBetween(string $key, string $value): QueryServer
+    {
+        $this->ormEntity->setFilter([(new QueryWhere($key, 'not between', $value))->toArray()]);
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param string $direction
+     * @return $this
+     */
+    public function orderBy(string $key, string $direction = 'desc'): QueryServer
+    {
+        $queryOrderBy = (new QueryOrderBy($key, $direction));
+        $this->ormEntity->setOrderBy($queryOrderBy->getColumn());
+        $this->ormEntity->setSortedBy($queryOrderBy->getDirection());
+        return $this;
+    }
+
+    /**
+     * @param array $select
+     * @return $this
+     */
+    public function addSelect(array $select): QueryServer
+    {
+        $this->ormEntity->setSelect((new QuerySelect($select))->toArray());
+        return $this;
+    }
+
+    /**
+     * @param int $pageSize
+     * @param int $page
+     * @return $this
+     */
+    public function page(int $pageSize, int $page = 10): QueryServer
+    {
+        $queryPagination = (new QueryPagination($page, $pageSize));
+        $this->ormEntity->setPage($queryPagination->getPage());
+        $this->ormEntity->setPageSize($queryPagination->getPageSize());
+        return $this;
+    }
+
+
 }
