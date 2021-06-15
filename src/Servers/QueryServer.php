@@ -107,7 +107,9 @@ class QueryServer implements QueryServerContract
      */
     public function where(string $key, string $operation, $value = null): QueryServer
     {
-        $this->ormEntity->setFilter([(new QueryWhere($key, $operation, $value))->toArray()]);
+        $queryWhere = new QueryWhere($key, $operation, $value);
+        $field = $queryWhere->parserOperator();
+        $this->ormEntity->setFilter([$field => $queryWhere->getValue()]);
         return $this;
     }
 
@@ -118,7 +120,10 @@ class QueryServer implements QueryServerContract
      */
     public function whereIn(string $key, ...$value): QueryServer
     {
-        $this->ormEntity->setFilter([(new QueryWhere($key, 'in', $value))->toArray()]);
+
+        $queryWhere = new QueryWhere($key, 'in', $value);
+        $field = $queryWhere->parserOperator();
+        $this->ormEntity->setFilter([$field => $queryWhere->getValue()]);
         return $this;
     }
 
@@ -129,7 +134,9 @@ class QueryServer implements QueryServerContract
      */
     public function whereBetween(string $key, string $value): QueryServer
     {
-        $this->ormEntity->setFilter([(new QueryWhere($key, 'between', $value))->toArray()]);
+        $queryWhere = new QueryWhere($key, 'between', $value);
+        $field = $queryWhere->parserOperator();
+        $this->ormEntity->setFilter([$field => $queryWhere->getValue()]);
         return $this;
     }
 
@@ -140,9 +147,37 @@ class QueryServer implements QueryServerContract
      */
     public function whereNoBetween(string $key, string $value): QueryServer
     {
-        $this->ormEntity->setFilter([(new QueryWhere($key, 'not between', $value))->toArray()]);
+        $queryWhere = new QueryWhere($key, 'not between', $value);
+        $field = $queryWhere->parserOperator();
+        $this->ormEntity->setFilter([$field => $queryWhere->getValue()]);
         return $this;
     }
+
+    /**
+     * @param string $key
+     * @return $this
+     * @throws ParserException
+     */
+    public function removeWhere(string $key): QueryServer
+    {
+        if ($this->ormEntity->getFilter()) {
+
+            $result = $this->parser->apply($this->parserDataEntity, [
+                'filter' => $this->ormEntity->getFilter()
+            ])->getFilter();
+
+            /**
+             * @var $item QueryWhere
+             */
+            foreach ($result as $index => $item) {
+                if ($index !== $key) {
+                    $this->where($item->getField(), $item->getOperator(), $item->getValue());
+                }
+            }
+        }
+        return $this;
+    }
+
 
     /**
      * @param string $key

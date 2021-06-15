@@ -87,41 +87,41 @@ class QueryWhere implements Arrayable
     }
 
     /**
-     *
+     * @return string
      */
     public function parserOperator()
     {
         switch ($this->getOperator()) {
             case "in":
-                $operator = $this->getField() . '[in]';
+                $operator = $this->getField() . '{in}';
                 break;
             case "like":
-                $operator = $this->getField() . '[~]';
+                $operator = $this->getField() . '{like}';
                 break;
-            case "<>":
-                $operator = $this->getField() . '[!]';
+            case "neq":
+                $operator = $this->getField() . '{<>}';
                 break;
-            case "<":
-                $operator = $this->getField() . '[<]';
+            case "lt":
+                $operator = $this->getField() . '{<}';
                 break;
-            case "<=":
-                $operator = $this->getField() . '[<=]';
+            case "elt":
+                $operator = $this->getField() . '{<=}';
                 break;
-            case ">":
-                $operator = $this->getField() . '[>]';
+            case "gt":
+                $operator = $this->getField() . '{>}';
                 break;
-            case ">=":
-                $operator = $this->getField() . '[>=]';
+            case "egt":
+                $operator = $this->getField() . '{>=}';
                 break;
             case "between":
-                $operator = $this->getField() . '[<>]';
+                $operator = $this->getField() . '{between}';
                 break;
             case "not between":
-                $operator = $this->getField() . '[><]';
+                $operator = $this->getField() . '{not_between}';
                 break;
             case "=":
             default:
-                $operator = $this->getField() . '[=]';
+                $operator = $this->getField() . '{eq}';
                 break;
         }
         return $operator;
