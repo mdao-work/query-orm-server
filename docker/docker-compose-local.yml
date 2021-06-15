@@ -1,0 +1,17 @@
+version: '3'
+services:
+  query-orm-server:
+    image: registry.cn-hangzhou.aliyuncs.com/mdao/docker_php74:latest
+    container_name: query-orm-server
+    ports:
+      - 8093:80
+    volumes:
+      - ../:/www
+      - ./nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+    privileged: true
+    networks:
+      - custom_net
+networks:
+  custom_net:
+    external:
+      name: mdao_net
