@@ -3,6 +3,10 @@
 
 namespace mdao\QueryOrmServer\Contracts;
 
+use mdao\QueryOrmServer\Entities\QueryWhere;
+use mdao\QueryOrmServer\Entities\QueryWhereOr;
+use mdao\QueryOrmServer\Entities\QueryWheres;
+
 interface OrmEntityContract
 {
     /**
@@ -81,5 +85,16 @@ interface OrmEntityContract
      * @param mixed $select
      */
     public function setSelect($select): void;
+
+
+    public function addFilter(QueryWhere $queryWhere);
+
+    public function addWhereOr(QueryWhereOr $queryWhereOr);
+
+    public function addOrderBy();
+
+    public function addSortedBy();
+
+    public function addSelect();
 
 }

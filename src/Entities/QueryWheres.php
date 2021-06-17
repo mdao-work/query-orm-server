@@ -45,7 +45,7 @@ class QueryWheres implements \JsonSerializable, \ArrayAccess, \Iterator, \Counta
     {
         foreach ($items as $value) {
             list($field, $operator, $value) = $value;
-            $this->data[$field] = new QueryWhere($field, $operator, $value);
+            $this->data[$field] = new QueryWhereOr($field, $operator, $value);
         }
         return $this;
     }

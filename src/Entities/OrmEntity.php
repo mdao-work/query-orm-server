@@ -57,7 +57,8 @@ class OrmEntity implements OrmEntityContract
         ?int $pageSize = null,
         string $select = '',
         array $whereOr = []
-    ) {
+    )
+    {
         $this->filter = $filter;
         $this->whereOr = $whereOr;
         $this->orderBy = $orderBy;
@@ -76,7 +77,7 @@ class OrmEntity implements OrmEntityContract
     {
         $filter = $attributes['filter'] ?? [];
         if (is_string($filter)) {
-            $filter=json_decode($filter, true);
+            $filter = json_decode($filter, true);
         }
         $orderBy = $attributes['order_by'] ?? null;
         $sortedBy = $attributes['sorted_by'] ?? null;
@@ -85,13 +86,13 @@ class OrmEntity implements OrmEntityContract
         $select = $attributes['select'] ?? '';
         $whereOr = $attributes['where_or'] ?? [];
         if (is_string($whereOr)) {
-            $whereOr=json_decode($whereOr, true);
+            $whereOr = json_decode($whereOr, true);
         }
         if (is_array($orderBy)) {
-            $orderBy=implode(',', $orderBy);
+            $orderBy = implode(',', $orderBy);
         }
         if (is_array($sortedBy)) {
-            $sortedBy=implode(',', $sortedBy);
+            $sortedBy = implode(',', $sortedBy);
         }
         return new static($filter, $orderBy, $sortedBy, $page, $pageSize, $select, $whereOr);
     }
@@ -200,5 +201,32 @@ class OrmEntity implements OrmEntityContract
     public function setWhereOr(array $whereOr): void
     {
         $this->whereOr = $whereOr;
+    }
+
+    public function addFilter(QueryWhere $queryWhere)
+    {
+        $field = $queryWhere->parserOperator();
+        $this->filter[$field] = $queryWhere->getValue();
+    }
+
+    public function addWhereOr(QueryWhereOr $queryWhereOr)
+    {
+        $field = $queryWhereOr->parserOperator();
+        $this->whereOr[$field] = $queryWhereOr->getValue();
+    }
+
+    public function addOrderBy()
+    {
+        // TODO: Implement addOrderBy() method.
+    }
+
+    public function addSortedBy()
+    {
+        // TODO: Implement addSortedBy() method.
+    }
+
+    public function addSelect()
+    {
+        // TODO: Implement addSelect() method.
     }
 }

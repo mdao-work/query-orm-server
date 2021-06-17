@@ -2,23 +2,19 @@
 
 namespace mdao\QueryOrmServer\Test;
 
-use mdao\QueryOrmServer\Exception\ParserException;
 use \PHPUnit\Framework\TestCase;
 use mdao\QueryOrmServer\Servers\QueryServer;
 use mdao\QueryOrmServer\Entities\OrmEntity;
 
-class WhereArrayByAddTest extends TestCase
+class QueryServerTest extends TestCase
 {
     /**
-     * @throws ParserException
+     * @throws \mdao\QueryOrmServer\Exception\ParserException
      */
-    public function testParserAdd()
+    public function testParserEmpty()
     {
-        $data = [
-            'filter' => [
-            ],
-        ];
-        $queryServer = new QueryServer(OrmEntity::createEntity($data));
+        $queryServer =QueryServer::create();
+
         $queryServer->where('age', '=', '10');
         $queryServer->where('sex', '=', '2');
         $queryServer->whereIn('type', [1, 2]);
@@ -46,6 +42,4 @@ class WhereArrayByAddTest extends TestCase
         $this->assertEquals([6, 4], $queryServer->getQueryWheres()[3]->valueToArray());
         $this->assertEquals([6,4], $queryServer->getQueryWheres()[4]->valueToArray());
     }
-
-
 }
