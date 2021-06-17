@@ -7,6 +7,7 @@ use mdao\QueryOrmServer\Contracts\OrmEntityContract;
 use mdao\QueryOrmServer\Contracts\QueryServerContract;
 use mdao\QueryOrmServer\Entities\OrmEntity;
 use mdao\QueryOrmServer\Entities\ParserDataEntity;
+use mdao\QueryOrmServer\Entities\QueryOrderBys;
 use mdao\QueryOrmServer\Entities\QueryWhere;
 use mdao\QueryOrmServer\Entities\QueryWhereOr;
 use mdao\QueryOrmServer\Entities\QueryWhereOrs;
@@ -67,10 +68,10 @@ class QueryServer implements QueryServerContract
     }
 
     /**
-     * @return QueryOrderBy|null
+     * @return QueryOrderBys|null
      * @throws ParserException
      */
-    public function getQueryOrderBy(): ?array
+    public function getQueryOrderBy(): ?QueryOrderBys
     {
         if ($this->ormEntity->getOrderBy()) {
             return $this->parser->apply($this->parserDataEntity, [
@@ -274,8 +275,7 @@ class QueryServer implements QueryServerContract
     public function orderBy(string $key, string $direction = 'desc'): QueryServer
     {
         $queryOrderBy = (new QueryOrderBy($key, $direction));
-        $this->ormEntity->setOrderBy($queryOrderBy->getColumn());
-        $this->ormEntity->setSortedBy($queryOrderBy->getDirection());
+        $this->ormEntity->addOrderBy($queryOrderBy);
         return $this;
     }
 

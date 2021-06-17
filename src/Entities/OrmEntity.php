@@ -215,9 +215,22 @@ class OrmEntity implements OrmEntityContract
         $this->whereOr[$field] = $queryWhereOr->getValue();
     }
 
-    public function addOrderBy()
+    public function addOrderBy(QueryOrderBy $queryOrderBy)
     {
-        // TODO: Implement addOrderBy() method.
+
+        $orderBy = $this->orderBy ?? '';
+        $sortedBy = $this->sortedBy ?? '';
+
+        $orderBys = explode(',', $orderBy);
+        $sortedBys = explode(',', $sortedBy);
+
+        $orderBys[] = $queryOrderBy->getColumn();
+        $sortedBys[] = $queryOrderBy->getDirection();
+        $orderBys = array_unique($orderBys);
+
+        $this->orderBy = trim(implode(',', $orderBys), ',');
+        $this->sortedBy = trim(implode(',', $sortedBys), ',');
+
     }
 
     public function addSortedBy()
