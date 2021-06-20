@@ -31,8 +31,9 @@ class Parser
         $params = $parserEntityContract->apply($param);
 
         $filter = $params[$this->filter] ?? [];
-        $filter = $this->where($filter);
 
+        $filter = $this->where($filter);
+   
         $whereOr = $params[$this->whereOr] ?? [];
         $whereOr = $this->where($whereOr);
 

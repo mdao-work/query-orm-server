@@ -24,7 +24,7 @@ class ParserEntity implements Arrayable
     protected $whereOr;
 
     /**
-     * @var array
+     * @var QueryOrderBys
      */
     protected $order;
     /**
@@ -72,7 +72,7 @@ class ParserEntity implements Arrayable
      */
     public function setFilter(array $filter): self
     {
-        $this->filter= QueryWheres::createFilters($filter);
+        $this->filter = QueryWheres::createFilters($filter);
         return $this;
     }
 
@@ -90,14 +90,14 @@ class ParserEntity implements Arrayable
      */
     public function setWhereOr(array $filter): self
     {
-        $this->whereOr= QueryWhereOrs::createFilters($filter);
+        $this->whereOr = QueryWhereOrs::createFilters($filter);
         return $this;
     }
-    
+
     /**
-     * @return array
+     * @return QueryOrderBys
      */
-    public function getOrder()
+    public function getOrder(): QueryOrderBys
     {
         return $this->order;
     }
@@ -109,14 +109,7 @@ class ParserEntity implements Arrayable
      */
     public function setOrder(array $order): self
     {
-        $orders = [];
-        foreach ($order as $value) {
-            list($field, $direction) = $value;
-            $orders[] = new QueryOrderBy((string)$field, $direction);
-        }
-
-        $this->order = $orders;
-
+        $this->order = QueryOrderBys::create($order);
         return $this;
     }
 
@@ -167,7 +160,7 @@ class ParserEntity implements Arrayable
         $queries = [];
         if ($this->filter) {
             $filters = $this->getFilter();
-            $queries['filter'] =$filters->toArray();
+            $queries['filter'] = $filters->toArray();
         }
         if ($this->order) {
             $orders = $this->getOrder();
@@ -205,7 +198,7 @@ class ParserEntity implements Arrayable
     {
         $queries = [];
         if ($this->filter) {
-            $queries['filter']= $this->getFilter()->toArray();
+            $queries['filter'] = $this->getFilter()->toArray();
         }
 
         if ($this->select) {

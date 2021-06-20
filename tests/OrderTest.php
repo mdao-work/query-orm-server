@@ -32,10 +32,7 @@ class OrderTest extends TestCase
         $queryServer = new QueryServer(OrmEntity::createEntity($arrQuery));
 
         //验证表达式
-        $this->assertEquals([
-            'column' => 'id',
-            'direction' => 'desc',
-        ], $queryServer->getQueryOrderBy()[0]->toArray());
+        $this->assertEquals(['id', 'desc'], $queryServer->getQueryOrderBy()[0]->toArray());
     }
 
     /**
@@ -51,10 +48,7 @@ class OrderTest extends TestCase
 
         $queryServer = new QueryServer(OrmEntity::createEntity($arrQuery));
 
-        $this->assertEquals([
-            'column' => 'id',
-            'direction' => 'asc',
-        ], $queryServer->getQueryOrderBy()[0]->toArray());
+        $this->assertEquals(['id', 'asc'], $queryServer->getQueryOrderBy()[0]->toArray());
     }
 
     /**
@@ -71,15 +65,9 @@ class OrderTest extends TestCase
 
         $queryServer = new QueryServer(OrmEntity::createEntity($arrQuery));
 
-        $this->assertEquals([
-            'column' => 'id',
-            'direction' => 'desc',
-        ], $queryServer->getQueryOrderBy()[0]->toArray());
+        $this->assertEquals(['id', 'desc'], $queryServer->getQueryOrderBy()[0]->toArray());
 
-        $this->assertEquals([
-            'column' => 'type',
-            'direction' => 'asc',
-        ], $queryServer->getQueryOrderBy()[1]->toArray());
+        $this->assertEquals(['type', 'asc'], $queryServer->getQueryOrderBy()[1]->toArray());
     }
 
     /**
@@ -95,9 +83,6 @@ class OrderTest extends TestCase
         parse_str($data['query'], $arrQuery);
 
         $queryServer = new QueryServer(OrmEntity::createEntity($arrQuery));
-        $this->assertEquals([
-            'column' => 'id',
-            'direction' => 'asc',
-        ], $queryServer->getQueryOrderBy()[0]->toArray());
+        $this->assertEquals(['id', 'asc'], $queryServer->getQueryOrderBy()[0]->toArray());
     }
 }

@@ -65,7 +65,9 @@ class SelectTest extends TestCase
         $queryServer = new QueryServer(OrmEntity::createEntity($arrQuery));
 
         //验证表达式
-        $this->assertEquals(['id', 'date', 'text', 'b'], $queryServer->getQuerySelect()->toArray());
+        $this->assertEquals('id,date,content as text,aa as b', $queryServer->getQuerySelect()->getSelectToString());
+        $this->assertEquals(['id', 'date', 'content as text', 'aa as b'], $queryServer->getQuerySelect()->toArray());
+        $this->assertEquals(['id', 'date', 'content as text', 'aa as b'], $queryServer->getQuerySelect()->getSelect());
         $this->assertEquals(['content' => 'text', 'aa' => 'b'], $queryServer->getQuerySelect()->getAlias());
     }
 
@@ -83,7 +85,44 @@ class SelectTest extends TestCase
         $queryServer = new QueryServer(OrmEntity::createEntity($arrQuery));
 
         //验证表达式
-        $this->assertEquals(['id', 'date', 'text', 'b'], $queryServer->getQuerySelect()->toArray());
+        $this->assertEquals(['id', 'date', 'content as text', 'aa as b'], $queryServer->getQuerySelect()->toArray());
         $this->assertEquals(['content' => 'text', 'aa' => 'b'], $queryServer->getQuerySelect()->getAlias());
     }
+
+    /**
+     * 值
+     * @throws ParserException
+     */
+    public function testGetSelectToString()
+    {
+        $url = "https://www.baidu.com?select=,id,date,content:text,aa:b,";
+        //1.0 用parse_url解析URL
+        $data = parse_url($url);
+        parse_str($data['query'], $arrQuery);
+
+        $queryServer = new QueryServer(OrmEntity::createEntity($arrQuery));
+
+        //验证表达式
+        $this->assertEquals('id,date,content as text,aa as b', $queryServer->getQuerySelect()->getSelectToString());
+    }
+
+
+    /**
+     * 值
+     * @throws ParserException
+     */
+    public function testKeys()
+    {
+        $url = "https://www.baidu.com?select=,id,date,content:text,aa:b,";
+        //1.0 用parse_url解析URL
+        $data = parse_url($url);
+        parse_str($data['query'], $arrQuery);
+
+        $queryServer = new QueryServer(OrmEntity::createEntity($arrQuery));
+
+        //验证表达式
+        $this->assertEquals(['id', 'date', 'content', 'aa'], $queryServer->getQuerySelect()->getKeys());
+    }
+
+
 }

@@ -78,8 +78,8 @@ class QueryOrderBy implements Arrayable
     public function toArray(): array
     {
         return [
-            'column' => $this->getColumn(),
-            'direction' => $this->getDirection(),
+            $this->getColumn(),
+            $this->getDirection(),
         ];
     }
 }

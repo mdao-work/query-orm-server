@@ -125,21 +125,4 @@ class WhereArrayTest extends TestCase
         $this->assertEquals('between', $queryServer->getQueryWheres()[8]->toArray()[2]);
         $this->assertEquals('=', $queryServer->getQueryWheres()[9]->toArray()[2]);
     }
-
-    /**
-     * @throws ParserException
-     */
-    public function testAddWhere()
-    {
-        $data = [
-            'filter' => [],
-        ];
-        $queryServer = new QueryServer(OrmEntity::createEntity($data));
-        $queryServer->where('a', '=', 'bb');
-        dd($queryServer);
-
-//        $queryServer->
-
-        $this->assertNull($queryServer->getQueryWheres());
-    }
 }

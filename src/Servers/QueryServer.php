@@ -5,8 +5,11 @@ namespace mdao\QueryOrmServer\Servers;
 
 use mdao\QueryOrmServer\Contracts\OrmEntityContract;
 use mdao\QueryOrmServer\Contracts\QueryServerContract;
+use mdao\QueryOrmServer\Entities\OrmEntity;
 use mdao\QueryOrmServer\Entities\ParserDataEntity;
+use mdao\QueryOrmServer\Entities\QueryOrderBys;
 use mdao\QueryOrmServer\Entities\QueryWhere;
+use mdao\QueryOrmServer\Entities\QueryWhereOr;
 use mdao\QueryOrmServer\Entities\QueryWhereOrs;
 use mdao\QueryOrmServer\Entities\QueryWheres;
 use mdao\QueryOrmServer\Entities\QueryOrderBy;
@@ -26,6 +29,15 @@ class QueryServer implements QueryServerContract
         $this->ormEntity = $ormEntity;
         $this->parserDataEntity = new ParserDataEntity();
         $this->parser = new Parser();
+    }
+
+    /**
+     * @param array $data 创建一个 空的QueryServer 对象
+     * @return static
+     */
+    public static function create(array $data = []): QueryServer
+    {
+        return new static(OrmEntity::createEntity($data));
     }
 
     /**
@@ -56,10 +68,10 @@ class QueryServer implements QueryServerContract
     }
 
     /**
-     * @return QueryOrderBy|null
+     * @return QueryOrderBys|null
      * @throws ParserException
      */
-    public function getQueryOrderBy(): ?array
+    public function getQueryOrderBy(): ?QueryOrderBys
     {
         if ($this->ormEntity->getOrderBy()) {
             return $this->parser->apply($this->parserDataEntity, [
@@ -107,42 +119,151 @@ class QueryServer implements QueryServerContract
      */
     public function where(string $key, string $operation, $value = null): QueryServer
     {
-        $this->ormEntity->setFilter([(new QueryWhere($key, $operation, $value))->toArray()]);
+        $queryWhere = new QueryWhere($key, $operation, $value);
+        $this->ormEntity->addFilter($queryWhere);
         return $this;
     }
 
     /**
      * @param string $key
-     * @param mixed ...$value
+     * @param array $value
      * @return $this
      */
-    public function whereIn(string $key, ...$value): QueryServer
+    public function whereIn(string $key, array $value): QueryServer
     {
-        $this->ormEntity->setFilter([(new QueryWhere($key, 'in', $value))->toArray()]);
+        $queryWhere = new QueryWhere($key, 'in', $value);
+        $this->ormEntity->addFilter($queryWhere);
         return $this;
     }
 
     /**
      * @param string $key
-     * @param string $value
+     * @param array $value
      * @return $this
      */
-    public function whereBetween(string $key, string $value): QueryServer
+    public function whereBetween(string $key, array $value): QueryServer
     {
-        $this->ormEntity->setFilter([(new QueryWhere($key, 'between', $value))->toArray()]);
+        $queryWhere = new QueryWhere($key, 'between', $value);
+        $this->ormEntity->addFilter($queryWhere);
         return $this;
     }
 
     /**
      * @param string $key
-     * @param string $value
+     * @param array $value
      * @return $this
      */
-    public function whereNoBetween(string $key, string $value): QueryServer
+    public function whereNoBetween(string $key, array $value): QueryServer
     {
-        $this->ormEntity->setFilter([(new QueryWhere($key, 'not between', $value))->toArray()]);
+        $queryWhere = new QueryWhere($key, 'not between', $value);
+        $this->ormEntity->addFilter($queryWhere);
         return $this;
     }
+
+    /**
+     * 现在使用的是一个比较笨的方式，拿出所有的条件，然后再重新写入，以后优化
+     * @param string $key
+     * @return $this
+     * @throws ParserException
+     */
+    public function removeWhere(string $key): QueryServer
+    {
+        if ($this->ormEntity->getFilter()) {
+            $result = $this->parser->apply($this->parserDataEntity, [
+                'filter' => $this->ormEntity->getFilter()
+            ])->getFilter();
+
+            $this->ormEntity->setFilter([]);
+
+            /**
+             * @var $item QueryWhere
+             */
+            foreach ($result as $index => $item) {
+                if ($index !== $key) {
+                    $this->where($item->getField(), $item->getOperator(), $item->getValue());
+                }
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param string $operation
+     * @param null $value
+     * @return $this
+     */
+    public function whereOr(string $key, string $operation, $value = null): QueryServer
+    {
+        $queryWhere = new QueryWhereOr($key, $operation, $value);
+        $this->ormEntity->addWhereOr($queryWhere);
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param array $value
+     * @return $this
+     */
+    public function whereOrIn(string $key, array $value): QueryServer
+    {
+        $queryWhere = new QueryWhereOr($key, 'in', $value);
+        $this->ormEntity->addWhereOr($queryWhere);
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param array $value
+     * @return $this
+     */
+    public function whereOrBetween(string $key, array $value): QueryServer
+    {
+        $queryWhere = new QueryWhereOr($key, 'between', $value);
+        $this->ormEntity->addWhereOr($queryWhere);
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param array $value
+     * @return $this
+     */
+    public function whereOrNoBetween(string $key, array $value): QueryServer
+    {
+        $queryWhere = new QueryWhereOr($key, 'not between', $value);
+        $this->ormEntity->addWhereOr($queryWhere);
+        return $this;
+    }
+
+
+    /**
+     * 现在使用的是一个比较笨的方式，拿出所有的条件，然后再重新写入，以后优化
+     * @param string $key
+     * @return $this
+     * @throws ParserException
+     */
+    public function removeWhereOr(string $key): QueryServer
+    {
+        if ($this->ormEntity->getWhereOr()) {
+            $result = $this->parser->apply($this->parserDataEntity, [
+                'filter' => $this->ormEntity->getWhereOr()
+            ])->getFilter();
+
+            $this->ormEntity->setWhereOr([]);
+
+            /**
+             * @var $item QueryWhereOr
+             */
+            foreach ($result as $index => $item) {
+                if ($index !== $key) {
+                    $this->whereOr($item->getField(), $item->getOperator(), $item->getValue());
+                }
+            }
+        }
+        return $this;
+    }
+
 
     /**
      * @param string $key
@@ -152,8 +273,7 @@ class QueryServer implements QueryServerContract
     public function orderBy(string $key, string $direction = 'desc'): QueryServer
     {
         $queryOrderBy = (new QueryOrderBy($key, $direction));
-        $this->ormEntity->setOrderBy($queryOrderBy->getColumn());
-        $this->ormEntity->setSortedBy($queryOrderBy->getDirection());
+        $this->ormEntity->addOrderBy($queryOrderBy);
         return $this;
     }
 
@@ -179,6 +299,4 @@ class QueryServer implements QueryServerContract
         $this->ormEntity->setPageSize($queryPagination->getPageSize());
         return $this;
     }
-
-
 }

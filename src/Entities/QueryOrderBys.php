@@ -1,13 +1,12 @@
 <?php
 
-
 namespace mdao\QueryOrmServer\Entities;
 
 use Exception;
 use InvalidArgumentException;
 use Traversable;
 
-class QueryWheres implements \JsonSerializable, \ArrayAccess, \Iterator, \Countable
+class QueryOrderBys implements \JsonSerializable, \ArrayAccess, \Iterator, \Countable
 {
     // 数据信息
     protected $data = [];
@@ -22,30 +21,19 @@ class QueryWheres implements \JsonSerializable, \ArrayAccess, \Iterator, \Counta
      */
     public function __construct(array $data = [])
     {
-        $this->filters($data);
+        $this->setData($data);
         $this->class = static::class;
-    }
-
-    /**
-     * @param $field
-     * @param null $value
-     * @return $this
-     */
-    public function setFilter($field, $value = null): self
-    {
-        $this->data[$field] = $value;
-        return $this;
     }
 
     /**
      * @param array $items
      * @return $this
      */
-    public function filters(array $items = []): self
+    public function setData(array $items = []): self
     {
         foreach ($items as $value) {
-            list($field, $operator, $value) = $value;
-            $this->data[$field] = new QueryWhere($field, $operator, $value);
+            list($column, $direction) = $value;
+            $this->data[$column] = new QueryOrderBy($column, $direction);
         }
         return $this;
     }
@@ -54,7 +42,7 @@ class QueryWheres implements \JsonSerializable, \ArrayAccess, \Iterator, \Counta
      * @param array $items
      * @return $this
      */
-    public static function createFilters(array $items = []): self
+    public static function create(array $items = []): self
     {
         return new static($items);
     }
@@ -90,14 +78,10 @@ class QueryWheres implements \JsonSerializable, \ArrayAccess, \Iterator, \Counta
 
         $list = [];
         /**
-         * @var $queryWhere QueryWhere
+         * @var $queryOrderBy QueryOrderBy
          */
-        foreach ($this->data as $queryWhere) {
-            $list[$queryWhere->getField()] = [
-                'field' => $queryWhere->getField(),
-                'operator' => $queryWhere->getOperator(),
-                'value' => $queryWhere->getValue(),
-            ];
+        foreach ($this->data as $queryOrderBy) {
+            $list[] = $queryOrderBy->toArray();
         }
 
         return $list;
@@ -123,7 +107,7 @@ class QueryWheres implements \JsonSerializable, \ArrayAccess, \Iterator, \Counta
      */
     public function __set($name, $value)
     {
-        $this->setFilter($name, $value);
+        $this->setData([[$name, $value]]);
     }
 
     /**

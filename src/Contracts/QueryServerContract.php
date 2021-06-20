@@ -3,6 +3,7 @@
 
 namespace mdao\QueryOrmServer\Contracts;
 
+use mdao\QueryOrmServer\Entities\QueryOrderBys;
 use mdao\QueryOrmServer\Entities\QueryWhereOrs;
 use mdao\QueryOrmServer\Entities\QueryWheres;
 use mdao\QueryOrmServer\Entities\QueryPagination;
@@ -26,7 +27,7 @@ interface QueryServerContract
      * 排序
      * @return array|null
      */
-    public function getQueryOrderBy(): ?array;
+    public function getQueryOrderBy(): ?QueryOrderBys;
 
     /**
      * 分页
