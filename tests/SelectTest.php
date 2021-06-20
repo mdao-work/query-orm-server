@@ -67,6 +67,7 @@ class SelectTest extends TestCase
         //验证表达式
         $this->assertEquals('id,date,content as text,aa as b', $queryServer->getQuerySelect()->getSelectToString());
         $this->assertEquals(['id', 'date', 'content as text', 'aa as b'], $queryServer->getQuerySelect()->toArray());
+        $this->assertEquals(['id', 'date', 'content as text', 'aa as b'], $queryServer->getQuerySelect()->getSelect());
         $this->assertEquals(['content' => 'text', 'aa' => 'b'], $queryServer->getQuerySelect()->getAlias());
     }
 
