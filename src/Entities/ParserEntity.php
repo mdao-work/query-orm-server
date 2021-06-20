@@ -38,8 +38,7 @@ class ParserEntity implements Arrayable
         array $order = [],
         array $pagination = [],
         array $whereOr = []
-    )
-    {
+    ) {
         if (!empty($filter)) {
             $this->setFilter($filter);
         }

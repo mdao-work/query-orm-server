@@ -81,10 +81,7 @@ class QueryOrderBys implements \JsonSerializable, \ArrayAccess, \Iterator, \Coun
          * @var $queryOrderBy QueryOrderBy
          */
         foreach ($this->data as $queryOrderBy) {
-            $list[$queryOrderBy->getColumn()] = [
-                'column' => $queryOrderBy->getColumn(),
-                'direction' => $queryOrderBy->getDirection(),
-            ];
+            $list[] = $queryOrderBy->toArray();
         }
 
         return $list;

@@ -57,8 +57,7 @@ class OrmEntity implements OrmEntityContract
         ?int $pageSize = null,
         string $select = '',
         array $whereOr = []
-    )
-    {
+    ) {
         $this->filter = $filter;
         $this->whereOr = $whereOr;
         $this->orderBy = $orderBy;
@@ -230,7 +229,6 @@ class OrmEntity implements OrmEntityContract
 
         $this->orderBy = trim(implode(',', $orderBys), ',');
         $this->sortedBy = trim(implode(',', $sortedBys), ',');
-
     }
 
     public function addSortedBy()

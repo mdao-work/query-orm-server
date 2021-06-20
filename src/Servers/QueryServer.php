@@ -169,7 +169,6 @@ class QueryServer implements QueryServerContract
     public function removeWhere(string $key): QueryServer
     {
         if ($this->ormEntity->getFilter()) {
-
             $result = $this->parser->apply($this->parserDataEntity, [
                 'filter' => $this->ormEntity->getFilter()
             ])->getFilter();
@@ -247,7 +246,6 @@ class QueryServer implements QueryServerContract
     public function removeWhereOr(string $key): QueryServer
     {
         if ($this->ormEntity->getWhereOr()) {
-
             $result = $this->parser->apply($this->parserDataEntity, [
                 'filter' => $this->ormEntity->getWhereOr()
             ])->getFilter();
@@ -301,6 +299,4 @@ class QueryServer implements QueryServerContract
         $this->ormEntity->setPageSize($queryPagination->getPageSize());
         return $this;
     }
-
-
 }

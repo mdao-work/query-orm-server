@@ -33,24 +33,25 @@ class QuerySelect implements Arrayable
      */
     public function getSelect(): array
     {
-        if (empty($this->select)) {
+        $select = $this->select;
+        if (empty($select)) {
             return [];
         }
 
         if (!$alias = $this->getAlias()) {
-            return $this->select;
+            return $select;
         }
 
         //存在别名，则输出别名
-        foreach ($this->select as $index => $item) {
+        foreach ($select as $index => $item) {
             if ($result = $this->parserAlias($item)) {
                 if (isset($alias[$result[0]])) {
-                    $this->select[$index] = $alias[$result[0]];
+                    $select[$index] = $result[0] . ' as ' . $alias[$result[0]];
                 }
             }
         }
 
-        return $this->select;
+        return $select;
     }
 
     /**
@@ -101,5 +102,41 @@ class QuerySelect implements Arrayable
     public function toArray(): array
     {
         return $this->getSelect();
+    }
+
+    /**
+     * @return string
+     */
+    public function getSelectToString(): ?string
+    {
+        $select = $this->getSelect();
+        return empty($select) ? null : implode(',', $select);
+    }
+
+    /**
+     * 获取所有查询的真实的key
+     * @return array|null
+     */
+    public function getKeys(): ?array
+    {
+        $select = $this->select;
+        if (empty($select)) {
+            return null;
+        }
+
+        if (!$alias = $this->getAlias()) {
+            return $select;
+        }
+
+        //存在别名，则输出别名
+        foreach ($select as $index => $item) {
+            if ($result = $this->parserAlias($item)) {
+                if (isset($alias[$result[0]])) {
+                    $select[$index] = $result[0];
+                }
+            }
+        }
+
+        return empty($select) ? null : $select;
     }
 }

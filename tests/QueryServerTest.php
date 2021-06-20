@@ -53,16 +53,10 @@ class QueryServerTest extends TestCase
         $queryServer->orderBy('age');
         $queryServer->orderBy('id', 'asc');
 
-        $this->assertEquals('age', $queryServer->getQueryOrderBy()->toArray());
-        $this->assertEquals('sex', $queryServer->getQueryWheres()->toArray());
+        $this->assertEquals('age', $queryServer->getQueryOrderBy()->toArray()[0][0]);
+        $this->assertEquals('id', $queryServer->getQueryOrderBy()->toArray()[1][0]);
 
-        //验证表达式
-        $this->assertEquals('=', $queryServer->getQueryWheres()[0]->toArray()[1]);
-        $this->assertEquals('=', $queryServer->getQueryWheres()[1]->toArray()[1]);
-
-        //验证值
-        $this->assertEquals('10', $queryServer->getQueryWheres()[0]->toArray()[2]);
-        $this->assertEquals('2', $queryServer->getQueryWheres()[1]->toArray()[2]);
-
+        $this->assertEquals('desc', $queryServer->getQueryOrderBy()->toArray()[0][1]);
+        $this->assertEquals('asc', $queryServer->getQueryOrderBy()->toArray()[1][1]);
     }
 }

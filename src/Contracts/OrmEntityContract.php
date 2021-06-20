@@ -97,5 +97,4 @@ interface OrmEntityContract
     public function addSortedBy();
 
     public function addSelect();
-
 }
