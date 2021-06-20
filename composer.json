@@ -1,0 +1,37 @@
+{
+  "name": "mdao/query-orm-server",
+  "homepage": "https://github.com/mdao-work/query-orm-server.git",
+  "license": "MIT",
+  "description": "",
+  "authors": [
+    {
+      "name": "游戏都没味",
+      "email": "1012415019@qq.com"
+    }
+  ],
+  "require": {
+    "php": "^7.3",
+    "ext-json": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^8.0",
+    "symfony/var-dumper": "^5.2",
+    "friendsofphp/php-cs-fixer": "^2.15",
+    "phpmd/phpmd": "^2.7",
+    "squizlabs/php_codesniffer": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "mdao\\QueryOrmServer\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "mdao\\QueryOrmServer\\Test\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "phpunit --colors=always",
+    "test:ci": "composer test -- --verbose --coverage-text --coverage-clover=coverage.xml"
+  }
+}
