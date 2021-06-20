@@ -3,6 +3,7 @@
 
 namespace mdao\QueryOrmServer\Servers;
 
+use mdao\QueryOrmServer\Contracts\Arrayable;
 use mdao\QueryOrmServer\Contracts\OrmEntityContract;
 use mdao\QueryOrmServer\Contracts\QueryServerContract;
 use mdao\QueryOrmServer\Entities\OrmEntity;
@@ -18,7 +19,7 @@ use mdao\QueryOrmServer\Entities\QuerySelect;
 use mdao\QueryOrmServer\Exception\ParserException;
 use mdao\QueryOrmServer\Parser;
 
-class QueryServer implements QueryServerContract
+class QueryServer implements QueryServerContract, Arrayable
 {
     protected $ormEntity;
     protected $parserDataEntity;
@@ -273,7 +274,7 @@ class QueryServer implements QueryServerContract
     public function orderBy(string $key, string $direction = 'desc'): QueryServer
     {
         $queryOrderBy = (new QueryOrderBy($key, $direction));
-        $this->ormEntity->addOrderBy($queryOrderBy);
+        $this->ormEntity->addOrder($queryOrderBy);
         return $this;
     }
 
@@ -283,7 +284,8 @@ class QueryServer implements QueryServerContract
      */
     public function addSelect(array $select): QueryServer
     {
-        $this->ormEntity->setSelect((new QuerySelect($select))->toArray());
+        $querySelect = (new QuerySelect($select));
+        $this->ormEntity->addSelect($querySelect);
         return $this;
     }
 
@@ -298,5 +300,44 @@ class QueryServer implements QueryServerContract
         $this->ormEntity->setPage($queryPagination->getPage());
         $this->ormEntity->setPageSize($queryPagination->getPageSize());
         return $this;
+    }
+
+    /**
+     * @return array
+     * @throws ParserException
+     */
+    public function toArray(): array
+    {
+        $result = [];
+        //条件
+        if ($filterResult = $this->getQueryWheres()) {
+            $result['filter'] = $filterResult->toArray();
+        }
+
+        //条件
+        if ($whereOrResult = $this->getQueryWhereOrs()) {
+            $result['where_or'] = $whereOrResult->toArray();
+        }
+
+        //排序
+        if ($queryOrderBy = $this->getQueryOrderBy()) {
+            $result['order'] = $queryOrderBy->toArray();
+        }
+
+        //查询指定字段
+        if ($selectResult = $this->getQuerySelect()) {
+            $result['select'] = $selectResult->getSelect();
+        }
+
+        if ($pagination = $this->getQueryPagination()) {
+            $result['page'] = $pagination->getPage();
+            $result['page_size'] = $pagination->getPageSize();
+        }
+
+        if (empty($result)) {
+            return [];
+        }
+
+        return $result;
     }
 }

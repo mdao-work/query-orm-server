@@ -214,9 +214,8 @@ class OrmEntity implements OrmEntityContract
         $this->whereOr[$field] = $queryWhereOr->getValue();
     }
 
-    public function addOrderBy(QueryOrderBy $queryOrderBy)
+    public function addOrder(QueryOrderBy $queryOrderBy)
     {
-
         $orderBy = $this->orderBy ?? '';
         $sortedBy = $this->sortedBy ?? '';
 
@@ -231,13 +230,17 @@ class OrmEntity implements OrmEntityContract
         $this->sortedBy = trim(implode(',', $sortedBys), ',');
     }
 
-    public function addSortedBy()
+    public function addSelect(QuerySelect $querySelect)
     {
-        // TODO: Implement addSortedBy() method.
-    }
+        $select = $this->select ?? '';
 
-    public function addSelect()
-    {
-        // TODO: Implement addSelect() method.
+        $selects = explode(',', $select);
+        if (!empty($selects)) {
+            $selects = array_merge($selects, $querySelect->getSelect());
+        } else {
+            $selects = $querySelect->getSelect();
+        }
+        $selects = array_unique($selects);
+        $this->select = trim(implode(',', $selects), ',');
     }
 }

@@ -4,6 +4,7 @@
 namespace mdao\QueryOrmServer\Contracts;
 
 use mdao\QueryOrmServer\Entities\QueryOrderBy;
+use mdao\QueryOrmServer\Entities\QuerySelect;
 use mdao\QueryOrmServer\Entities\QueryWhere;
 use mdao\QueryOrmServer\Entities\QueryWhereOr;
 use mdao\QueryOrmServer\Entities\QueryWheres;
@@ -92,9 +93,7 @@ interface OrmEntityContract
 
     public function addWhereOr(QueryWhereOr $queryWhereOr);
 
-    public function addOrderBy(QueryOrderBy $queryOrderBy);
+    public function addOrder(QueryOrderBy $queryOrderBy);
 
-    public function addSortedBy();
-
-    public function addSelect();
+    public function addSelect(QuerySelect $querySelect);
 }

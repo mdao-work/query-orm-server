@@ -89,10 +89,18 @@ class QuerySelect implements Arrayable
      */
     private function parserAlias(string $field): array
     {
+        //格式1 xxx:xxx
         if (stripos($field, ':')) {
             return explode(':', $field);
         }
 
+        //格式二 xxx as bb 正则不太熟，以后优化
+        preg_match('/(.*)\s+(as)\s+(.*)?/i', $field, $matches);
+        if (!empty($matches[1] && !empty($matches[3]))) {
+            $oriField = trim($matches[1]);
+            $asField = trim($matches[3]);
+            return [$oriField, $asField];
+        }
         return [];
     }
 

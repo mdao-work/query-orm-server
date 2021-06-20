@@ -59,4 +59,70 @@ class QueryServerTest extends TestCase
         $this->assertEquals('desc', $queryServer->getQueryOrderBy()->toArray()[0][1]);
         $this->assertEquals('asc', $queryServer->getQueryOrderBy()->toArray()[1][1]);
     }
+
+    /**
+     * @throws \mdao\QueryOrmServer\Exception\ParserException
+     */
+    public function testToArray()
+    {
+        $queryServer = QueryServer::create();
+
+        $queryServer->where('age', '=', '10');
+        $queryServer->where('sex', '=', '2');
+        $queryServer->whereOr('age_or', '=', '10');
+        $queryServer->whereOr('sex_or', '=', '2');
+        $queryServer->addSelect(['sex_or', 'age']);
+        $queryServer->page(1, 20);
+        $queryServer->orderBy('age');
+        $queryServer->orderBy('id', 'asc');
+        $queryServerArray = $queryServer->toArray();
+
+        $this->assertEquals([
+            "age" => [
+                "field" => "age",
+                "operator" => "=",
+                "value" => "10",
+            ],
+            "sex" => [
+                "field" => "sex",
+                "operator" => "=",
+                "value" => "2",
+            ]
+        ], $queryServerArray['filter']);
+
+        $this->assertEquals([
+            "age_or" => [
+                "field" => "age_or",
+                "operator" => "=",
+                "value" => "10",
+            ],
+            "sex_or" => [
+                "field" => "sex_or",
+                "operator" => "=",
+                "value" => "2",
+            ]
+        ], $queryServerArray['where_or']);
+
+        $this->assertEquals([
+            ["age", "desc"], ["id", "asc"]
+        ], $queryServerArray['order']);
+
+
+        $this->assertEquals(["sex_or", "age"], $queryServerArray['select']);
+        $this->assertEquals(20, $queryServerArray['page']);
+        $this->assertEquals(1, $queryServerArray['page_size']);
+
+    }
+
+    /**
+     * @throws \mdao\QueryOrmServer\Exception\ParserException
+     */
+    public function testSelectToArray()
+    {
+        $queryServer = QueryServer::create();
+        $queryServer->addSelect(['sex_or', 'age', 'text as b']);
+        $queryServerArray = $queryServer->toArray();
+        $this->assertEquals(["sex_or", "age"], $queryServerArray['select']);
+
+    }
 }

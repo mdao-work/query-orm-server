@@ -17,7 +17,6 @@ class Parser
     protected $page = 'page';
     protected $pageSize = 'page_size';
     protected $select = 'select';
-    protected $param = 'select';
 
     /**
      * @param ParserEntityContract $parserEntityContract
@@ -33,7 +32,7 @@ class Parser
         $filter = $params[$this->filter] ?? [];
 
         $filter = $this->where($filter);
-   
+
         $whereOr = $params[$this->whereOr] ?? [];
         $whereOr = $this->where($whereOr);
 
