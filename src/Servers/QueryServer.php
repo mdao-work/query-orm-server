@@ -18,8 +18,6 @@ use mdao\QueryOrmServer\Entities\QueryPagination;
 use mdao\QueryOrmServer\Entities\QuerySelect;
 use mdao\QueryOrmServer\Exception\ParserException;
 use mdao\QueryOrmServer\Parser;
-use think\db\Expression;
-use think\db\Query;
 
 class QueryServer implements QueryServerContract, Arrayable
 {
