@@ -18,6 +18,8 @@ use mdao\QueryOrmServer\Entities\QueryPagination;
 use mdao\QueryOrmServer\Entities\QuerySelect;
 use mdao\QueryOrmServer\Exception\ParserException;
 use mdao\QueryOrmServer\Parser;
+use think\db\Expression;
+use think\db\Query;
 
 class QueryServer implements QueryServerContract, Arrayable
 {
@@ -160,6 +162,57 @@ class QueryServer implements QueryServerContract, Arrayable
         $this->ormEntity->addFilter($queryWhere);
         return $this;
     }
+
+    /**
+     * 查询日期或者时间范围
+     * @access public
+     * @param string    $field 日期字段名
+     * @param string    $startTime    开始时间
+     * @param string    $endTime 结束时间
+     * @return $this
+     */
+    public function whereBetweenTime($field, $startTime, $endTime = null)
+    {
+        if (is_null($endTime)) {
+            $time    = is_string($startTime) ? strtotime($startTime) : $startTime;
+            $endTime = strtotime('+1 day', $time);
+        }
+        $this->where($field, 'between time', [$startTime, $endTime]);
+        return $this;
+    }
+
+    /**
+     * 数组批量查询
+     * @access protected
+     * @param  array    $field     批量查询
+     * @param  string   $logic     查询逻辑 and or xor
+     * @return $this
+     */
+    protected function parseArrayWhereItems($field, $logic)
+    {
+        if (key($field) !== 0) {
+            $where = [];
+            foreach ($field as $key => $val) {
+                if ($val instanceof Expression) {
+                    $where[] = [$key, 'exp', $val];
+                } elseif (is_null($val)) {
+                    $where[] = [$key, 'NULL', ''];
+                } else {
+                    $where[] = [$key, is_array($val) ? 'IN' : '=', $val];
+                }
+            }
+        } else {
+            // 数组批量查询
+            $where = $field;
+        }
+
+        if (!empty($where)) {
+            $this->options['where'][$logic] = isset($this->options['where'][$logic]) ? array_merge($this->options['where'][$logic], $where) : $where;
+        }
+
+        return $this;
+    }
+
 
     /**
      * 现在使用的是一个比较笨的方式，拿出所有的条件，然后再重新写入，以后优化

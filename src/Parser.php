@@ -3,6 +3,7 @@
 
 namespace mdao\QueryOrmServer;
 
+use mdao\QueryOrmServer\Entities\QueryWhereExp;
 use mdao\QueryOrmServer\Exception\ParserException;
 use mdao\QueryOrmServer\Entities\ParserEntity;
 use mdao\QueryOrmServer\Contracts\ParserEntityContract;
@@ -74,81 +75,12 @@ class Parser
     }
 
     /**
-     *filed[~] like
-     *filed[in] in
-     *field[!] !=
-     *field[=] =
-     *field[>] >
-     *field[>=] >=
-     *field[<] <
-     *field[<=] <=
-     *field[<>] BETWEEN
-     *field[><] NOT BETWEEN
      * @param array $values
      * @return array
      */
     public function where(array $values): array
     {
-        $where = [];
-        $regexp = '/([a-zA-Z0-9_\.]+)(\{(?<operator>|eq|neq|gt|egt|lt|elt|like|in|between|not_in|not_between|\!?~)\})?/i';
-
-        foreach ($values as $field => $value) {
-            preg_match($regexp, "[{$field}]", $match);
-            $operator = $match['operator'] ?? '';
-            $operator = $this->operator($operator);
-
-            //是否字符串数组，是字符串数组，转换成数组
-            $tempValue = $this->stringArrayConvertToArray($value);
-            if (is_array($value) || !empty($tempValue)) {
-                $operator = 'in';
-                $value = empty($tempValue) ? $value : $tempValue;
-            }
-
-            $where[] = [$match[1], $operator, $value];
-        }
-        return $where;
-    }
-
-    /**
-     * @param string $value
-     * @return string
-     */
-    public function operator(string $value): string
-    {
-        switch ($value) {
-            case "in":
-                $operator = 'in';
-                break;
-            case "like":
-                $operator = 'like';
-                break;
-            case "neq":
-                $operator = '<>';
-                break;
-            case "lt":
-                $operator = '<';
-                break;
-            case "elt":
-                $operator = '<=';
-                break;
-            case "gt":
-                $operator = '>';
-                break;
-            case "egt":
-                $operator = '>=';
-                break;
-            case "between":
-                $operator = 'between';
-                break;
-            case "not_between":
-                $operator = 'not between';
-                break;
-            case "eq":
-            default:
-                $operator = '=';
-                break;
-        }
-        return $operator;
+        return (new QueryWhereExp())->where($values);
     }
 
     /**
@@ -205,28 +137,5 @@ class Parser
         }
 
         throw new ParserException('error');
-    }
-
-    /**
-     * 字符串、数组转换为格式化的数组
-     * @param string $data 原始字符串
-     * @return array
-     */
-    private function stringArrayConvertToArray(string $data): array
-    {
-        // 数组原样返回
-        if (is_array($data)) {
-            return $data;
-        }
-        $result = [];
-        // 字符串处理
-        $string = (string)$data;
-        if (!empty($string) && preg_match('/^\[.*?]$/', $string)) {
-            $result = json_decode($string, true);
-        }
-        if (!is_array($result) || count($result) < 1) {
-            return [];
-        }
-        return $result;
     }
 }
