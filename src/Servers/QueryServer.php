@@ -16,6 +16,7 @@ use mdao\QueryOrmServer\Entities\QueryWheres;
 use mdao\QueryOrmServer\Entities\QueryOrderBy;
 use mdao\QueryOrmServer\Entities\QueryPagination;
 use mdao\QueryOrmServer\Entities\QuerySelect;
+use mdao\QueryOrmServer\Entities\QueryWhereTime;
 use mdao\QueryOrmServer\Exception\ParserException;
 use mdao\QueryOrmServer\Parser;
 
@@ -113,15 +114,24 @@ class QueryServer implements QueryServerContract, Arrayable
     }
 
     /**
-     * @param string $key
-     * @param string $operation
+     * @param string|array $key
+     * @param ?string $operation
      * @param null $value
      * @return $this
      */
-    public function where(string $key, string $operation, $value = null): QueryServer
+    public function where($key, ?string $operation = null, $value = null): QueryServer
     {
-        $queryWhere = new QueryWhere($key, $operation, $value);
-        $this->ormEntity->addFilter($queryWhere);
+        //批量数组模式
+        if (is_array($key)) {
+            foreach ($key as $val) {
+                list($filed, $operation, $value) = $val;
+                $queryWhere = new QueryWhere($filed, $operation, $value);
+                $this->ormEntity->addFilter($queryWhere);
+            }
+        } else {
+            $queryWhere = new QueryWhere($key, $operation, $value);
+            $this->ormEntity->addFilter($queryWhere);
+        }
         return $this;
     }
 
@@ -157,6 +167,24 @@ class QueryServer implements QueryServerContract, Arrayable
     public function whereNoBetween(string $key, array $value): QueryServer
     {
         $queryWhere = new QueryWhere($key, 'not between', $value);
+        $this->ormEntity->addFilter($queryWhere);
+        return $this;
+    }
+
+    /**
+     * 查询日期或者时间范围
+     * @param string $field 字段
+     * @param string|int $startTime
+     * @param string|null $endTime
+     * @return $this
+     */
+    public function whereBetweenTime(string $field, $startTime, ?string $endTime = null): QueryServer
+    {
+        if (is_null($endTime)) {
+            $time = is_string($startTime) ? strtotime($startTime) : $startTime;
+            $endTime = strtotime('+1 day', $time);
+        }
+        $queryWhere = new QueryWhereTime($field, 'between', [$startTime, $endTime]);
         $this->ormEntity->addFilter($queryWhere);
         return $this;
     }
