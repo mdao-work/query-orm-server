@@ -16,6 +16,7 @@ use mdao\QueryOrmServer\Entities\QueryWheres;
 use mdao\QueryOrmServer\Entities\QueryOrderBy;
 use mdao\QueryOrmServer\Entities\QueryPagination;
 use mdao\QueryOrmServer\Entities\QuerySelect;
+use mdao\QueryOrmServer\Entities\QueryWhereTime;
 use mdao\QueryOrmServer\Exception\ParserException;
 use mdao\QueryOrmServer\Parser;
 
@@ -113,15 +114,24 @@ class QueryServer implements QueryServerContract, Arrayable
     }
 
     /**
-     * @param string $key
-     * @param string $operation
+     * @param string|array $key
+     * @param ?string $operation
      * @param null $value
      * @return $this
      */
-    public function where(string $key, string $operation, $value = null): QueryServer
+    public function where($key, ?string $operation = null, $value = null): QueryServer
     {
-        $queryWhere = new QueryWhere($key, $operation, $value);
-        $this->ormEntity->addFilter($queryWhere);
+        //批量数组模式
+        if (is_array($key)) {
+            foreach ($key as $val) {
+                list($filed, $operation, $value) = $val;
+                $queryWhere = new QueryWhere($filed, $operation, $value);
+                $this->ormEntity->addFilter($queryWhere);
+            }
+        } else {
+            $queryWhere = new QueryWhere($key, $operation, $value);
+            $this->ormEntity->addFilter($queryWhere);
+        }
         return $this;
     }
 
@@ -163,54 +173,21 @@ class QueryServer implements QueryServerContract, Arrayable
 
     /**
      * 查询日期或者时间范围
-     * @access public
-     * @param string    $field 日期字段名
-     * @param string    $startTime    开始时间
-     * @param string    $endTime 结束时间
+     * @param string $field 字段
+     * @param string|int $startTime
+     * @param string|null $endTime
      * @return $this
      */
-    public function whereBetweenTime($field, $startTime, $endTime = null)
+    public function whereBetweenTime(string $field, $startTime, ?string $endTime = null): QueryServer
     {
         if (is_null($endTime)) {
-            $time    = is_string($startTime) ? strtotime($startTime) : $startTime;
+            $time = is_string($startTime) ? strtotime($startTime) : $startTime;
             $endTime = strtotime('+1 day', $time);
         }
-        $this->where($field, 'between time', [$startTime, $endTime]);
+        $queryWhere = new QueryWhereTime($field, 'between', [$startTime, $endTime]);
+        $this->ormEntity->addFilter($queryWhere);
         return $this;
     }
-
-    /**
-     * 数组批量查询
-     * @access protected
-     * @param  array    $field     批量查询
-     * @param  string   $logic     查询逻辑 and or xor
-     * @return $this
-     */
-    protected function parseArrayWhereItems($field, $logic)
-    {
-        if (key($field) !== 0) {
-            $where = [];
-            foreach ($field as $key => $val) {
-                if ($val instanceof Expression) {
-                    $where[] = [$key, 'exp', $val];
-                } elseif (is_null($val)) {
-                    $where[] = [$key, 'NULL', ''];
-                } else {
-                    $where[] = [$key, is_array($val) ? 'IN' : '=', $val];
-                }
-            }
-        } else {
-            // 数组批量查询
-            $where = $field;
-        }
-
-        if (!empty($where)) {
-            $this->options['where'][$logic] = isset($this->options['where'][$logic]) ? array_merge($this->options['where'][$logic], $where) : $where;
-        }
-
-        return $this;
-    }
-
 
     /**
      * 现在使用的是一个比较笨的方式，拿出所有的条件，然后再重新写入，以后优化
