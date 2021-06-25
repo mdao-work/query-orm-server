@@ -11,7 +11,35 @@ class QueryServerTest extends TestCase
     /**
      * @throws \mdao\QueryOrmServer\Exception\ParserException
      */
-    public function testParserEmpty()
+    public function testWhereExp()
+    {
+        $queryServer = QueryServer::create();
+
+        $queryServer->where('field_1', '=', '10');
+        $queryServer->where('field_2', '<>', '2');
+        $queryServer->where('field_3', '>', '2');
+        $queryServer->where('field_4', '>=', '2');
+        $queryServer->where('field_5', '<', '2');
+        $queryServer->where('field_6', '<=', '2');
+        $queryServer->where('field_7', 'like', '2');
+        $queryServer->where('field_8', 'in', '2');
+        $queryServer->where('field_9', 'between', '2');
+
+        $this->assertEquals('=', $queryServer->getQueryWheres()[0]->toArray()[1]);
+        $this->assertEquals('<>', $queryServer->getQueryWheres()[1]->toArray()[1]);
+        $this->assertEquals('>', $queryServer->getQueryWheres()[2]->toArray()[1]);
+        $this->assertEquals('>=', $queryServer->getQueryWheres()[3]->toArray()[1]);
+        $this->assertEquals('<', $queryServer->getQueryWheres()[4]->toArray()[1]);
+        $this->assertEquals('<=', $queryServer->getQueryWheres()[5]->toArray()[1]);
+        $this->assertEquals('like', $queryServer->getQueryWheres()[6]->toArray()[1]);
+        $this->assertEquals('in', $queryServer->getQueryWheres()[7]->toArray()[1]);
+        $this->assertEquals('between', $queryServer->getQueryWheres()[8]->toArray()[1]);
+    }
+
+    /**
+     * @throws \mdao\QueryOrmServer\Exception\ParserException
+     */
+    public function testCreate()
     {
         $queryServer = QueryServer::create();
 
@@ -111,7 +139,6 @@ class QueryServerTest extends TestCase
         $this->assertEquals(["sex_or", "age"], $queryServerArray['select']);
         $this->assertEquals(20, $queryServerArray['page']);
         $this->assertEquals(1, $queryServerArray['page_size']);
-
     }
 
     /**
@@ -122,7 +149,6 @@ class QueryServerTest extends TestCase
         $queryServer = QueryServer::create();
         $queryServer->addSelect(['sex_or', 'age', 'text as b']);
         $queryServerArray = $queryServer->toArray();
-        $this->assertEquals(["sex_or", "age"], $queryServerArray['select']);
-
+        $this->assertEquals(["sex_or", "age", 'text as b'], $queryServerArray['select']);
     }
 }

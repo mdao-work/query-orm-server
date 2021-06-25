@@ -123,6 +123,4 @@ class SelectTest extends TestCase
         //验证表达式
         $this->assertEquals(['id', 'date', 'content', 'aa'], $queryServer->getQuerySelect()->getKeys());
     }
-
-
 }

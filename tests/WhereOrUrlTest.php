@@ -26,7 +26,7 @@ class WhereOrUrlTest extends TestCase
      */
     public function testParserExp()
     {
-        $url = "https://www.baidu.com?where_or[created_at_1{eq}]=1&where_or[created_at_2{neq}]=2&where_or[created_at_3{gt}]=3&where_or[created_at_4{egt}]=4&where_or[created_at_5{lt}]=5&where_or[created_at_6{elt}]=6&where_or[created_at_7{like}]=7&where_or[created_at_8{in}]=8&where_or[created_at_9{between}]=9&where_or[created_at_10]=10";
+        $url = "https://www.baidu.com?where_or[field_1{eq}]=1&where_or[field_2{neq}]=2&where_or[field_3{gt}]=3&where_or[field_4{egt}]=4&where_or[field_5{lt}]=5&where_or[field_6{elt}]=6&where_or[field_7{like}]=7&where_or[field_8{in}]=8&where_or[field_9{between}]=9&where_or[field_10]=10";
         //1.0 用parse_url解析URL
         $data = parse_url($url);
         parse_str($data['query'], $arrQuery);
@@ -52,7 +52,7 @@ class WhereOrUrlTest extends TestCase
      */
     public function testParserInExp()
     {
-        $url = "https://www.baidu.com?where_or[created_at_1]=[1,2,3]&where_or[created_at_2]=2,3,4&where_or[created_at_3{in}]=3&where_or[created_at_4{in}]=2,3,4&where_or[created_at_5{in}]=[1,2,3]";
+        $url = "https://www.baidu.com?where_or[field_1]=[1,2,3]&where_or[field_2]=2,3,4&where_or[field_3{in}]=3&where_or[field_4{in}]=2,3,4&where_or[field_5{in}]=[1,2,3]";
         //1.0 用parse_url解析URL
         $data = parse_url($url);
         parse_str($data['query'], $arrQuery);
@@ -60,11 +60,11 @@ class WhereOrUrlTest extends TestCase
         $queryServer = new QueryServer(OrmEntity::createEntity($arrQuery));
 
         //验证字段
-        $this->assertEquals('created_at_1', $queryServer->getQueryWhereOrs()[0]->toArray()[0]);
-        $this->assertEquals('created_at_2', $queryServer->getQueryWhereOrs()[1]->toArray()[0]);
-        $this->assertEquals('created_at_3', $queryServer->getQueryWhereOrs()[2]->toArray()[0]);
-        $this->assertEquals('created_at_4', $queryServer->getQueryWhereOrs()[3]->toArray()[0]);
-        $this->assertEquals('created_at_5', $queryServer->getQueryWhereOrs()[4]->toArray()[0]);
+        $this->assertEquals('field_1', $queryServer->getQueryWhereOrs()[0]->toArray()[0]);
+        $this->assertEquals('field_2', $queryServer->getQueryWhereOrs()[1]->toArray()[0]);
+        $this->assertEquals('field_3', $queryServer->getQueryWhereOrs()[2]->toArray()[0]);
+        $this->assertEquals('field_4', $queryServer->getQueryWhereOrs()[3]->toArray()[0]);
+        $this->assertEquals('field_5', $queryServer->getQueryWhereOrs()[4]->toArray()[0]);
 
         //验证表达式
         $this->assertEquals('in', $queryServer->getQueryWhereOrs()[0]->toArray()[1]);
@@ -87,7 +87,7 @@ class WhereOrUrlTest extends TestCase
      */
     public function testParserField()
     {
-        $url = "https://www.baidu.com?created_at_1[eq]=1&created_at_2[neq]=2&created_at_3[gt]=3&created_at_4[egt]=4&created_at_5[lt]=5&created_at_6[elt]=6&created_at_7[like]=7&created_at_8[in]=8&created_at_9[between]=9&created_at_10=10";
+        $url = "https://www.baidu.com?field_1[eq]=1&field_2[neq]=2&field_3[gt]=3&field_4[egt]=4&field_5[lt]=5&field_6[elt]=6&field_7[like]=7&field_8[in]=8&field_9[between]=9&field_10=10";
         //1.0 用parse_url解析URL
         $data = parse_url($url);
 
@@ -97,16 +97,16 @@ class WhereOrUrlTest extends TestCase
         $queryServer = new QueryServer(OrmEntity::createEntity(['where_or' => $arrQuery]));
 
         //验证表达式
-        $this->assertEquals('created_at_1', $queryServer->getQueryWhereOrs()[0]->toArray()[0]);
-        $this->assertEquals('created_at_2', $queryServer->getQueryWhereOrs()[1]->toArray()[0]);
-        $this->assertEquals('created_at_3', $queryServer->getQueryWhereOrs()[2]->toArray()[0]);
-        $this->assertEquals('created_at_4', $queryServer->getQueryWhereOrs()[3]->toArray()[0]);
-        $this->assertEquals('created_at_5', $queryServer->getQueryWhereOrs()[4]->toArray()[0]);
-        $this->assertEquals('created_at_6', $queryServer->getQueryWhereOrs()[5]->toArray()[0]);
-        $this->assertEquals('created_at_7', $queryServer->getQueryWhereOrs()[6]->toArray()[0]);
-        $this->assertEquals('created_at_8', $queryServer->getQueryWhereOrs()[7]->toArray()[0]);
-        $this->assertEquals('created_at_9', $queryServer->getQueryWhereOrs()[8]->toArray()[0]);
-        $this->assertEquals('created_at_10', $queryServer->getQueryWhereOrs()[9]->toArray()[0]);
+        $this->assertEquals('field_1', $queryServer->getQueryWhereOrs()[0]->toArray()[0]);
+        $this->assertEquals('field_2', $queryServer->getQueryWhereOrs()[1]->toArray()[0]);
+        $this->assertEquals('field_3', $queryServer->getQueryWhereOrs()[2]->toArray()[0]);
+        $this->assertEquals('field_4', $queryServer->getQueryWhereOrs()[3]->toArray()[0]);
+        $this->assertEquals('field_5', $queryServer->getQueryWhereOrs()[4]->toArray()[0]);
+        $this->assertEquals('field_6', $queryServer->getQueryWhereOrs()[5]->toArray()[0]);
+        $this->assertEquals('field_7', $queryServer->getQueryWhereOrs()[6]->toArray()[0]);
+        $this->assertEquals('field_8', $queryServer->getQueryWhereOrs()[7]->toArray()[0]);
+        $this->assertEquals('field_9', $queryServer->getQueryWhereOrs()[8]->toArray()[0]);
+        $this->assertEquals('field_10', $queryServer->getQueryWhereOrs()[9]->toArray()[0]);
     }
 
     /**
@@ -115,7 +115,7 @@ class WhereOrUrlTest extends TestCase
      */
     public function testParserValue()
     {
-        $url = "https://www.baidu.com?where_or[created_at_1{eq}]=1&where_or[created_at_2{neq}]=2&where_or[created_at_3{gt}]=3&where_or[created_at_4{egt}]=4&where_or[created_at_5{lt}]=5&where_or[created_at_6{elt}]=6&where_or[created_at_7{like}]=7&where_or[created_at_8{in}]=8,9&where_or[created_at_9{between}]=9,10&where_or[created_at_10]=10";
+        $url = "https://www.baidu.com?where_or[field_1{eq}]=1&where_or[field_2{neq}]=2&where_or[field_3{gt}]=3&where_or[field_4{egt}]=4&where_or[field_5{lt}]=5&where_or[field_6{elt}]=6&where_or[field_7{like}]=7&where_or[field_8{in}]=8,9&where_or[field_9{between}]=9,10&where_or[field_10]=10";
         //1.0 用parse_url解析URL
         $data = parse_url($url);
         parse_str($data['query'], $arrQuery);
@@ -152,5 +152,4 @@ class WhereOrUrlTest extends TestCase
 
         return $params;
     }
-
 }

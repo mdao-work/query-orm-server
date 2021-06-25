@@ -89,42 +89,12 @@ class QueryWhere implements Arrayable
     /**
      * @return string
      */
-    public function parserOperator()
+    public function parserOperator(): string
     {
-        switch ($this->getOperator()) {
-            case "in":
-                $operator = $this->getField() . '{in}';
-                break;
-            case "like":
-                $operator = $this->getField() . '{like}';
-                break;
-            case "neq":
-                $operator = $this->getField() . '{<>}';
-                break;
-            case "lt":
-                $operator = $this->getField() . '{<}';
-                break;
-            case "elt":
-                $operator = $this->getField() . '{<=}';
-                break;
-            case "gt":
-                $operator = $this->getField() . '{>}';
-                break;
-            case "egt":
-                $operator = $this->getField() . '{>=}';
-                break;
-            case "between":
-                $operator = $this->getField() . '{between}';
-                break;
-            case "not between":
-                $operator = $this->getField() . '{not_between}';
-                break;
-            case "=":
-            default:
-                $operator = $this->getField() . '{eq}';
-                break;
-        }
-        return $operator;
+        $operator = (new QueryWhereExp())->getExpUrlKeyMapValue($this->getOperator());
+        $field = $this->getField();
+        //字段{表达式}
+        return $field . "{" . $operator . "}";
     }
 
     /**
