@@ -77,6 +77,8 @@ class QueryWheres implements \JsonSerializable, \ArrayAccess, \Iterator, \Counta
         }
     }
 
+
+
     /**
      * 转换当前模型对象为数组
      * @access public
