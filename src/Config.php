@@ -39,35 +39,35 @@ class Config
     public function __construct(array $param = [])
     {
         if (!empty($param['param'])) {
+
             $this->param = array_merge($this->param, $param['param']);
-
             // 比较笨的办法
-            foreach ($this->param as $attributes) {
+            foreach ($this->param as $key => $value) {
 
-                if (!empty($attributes['filter'])) {
-                    $this->filter = $attributes['filter'];
-                }
-
-                if (!empty($attributes['order_by'])) {
-                    $this->orderBy = $attributes['order_by'];
-                }
-                if (!empty($attributes['sorted_by'])) {
-                    $this->sortedBy = $attributes['sorted_by'];
-                }
-                if (!empty($attributes['page'])) {
-                    $this->page = $attributes['page'];
+                if ($key == 'filter') {
+                    $this->filter = $value;
                 }
 
-                if (!empty($attributes['page_size'])) {
-                    $this->pageSize = $attributes['page_size'];
+                if ($key == 'order_by') {
+                    $this->orderBy = $value;
+                }
+                if ($key == 'sorted_by') {
+                    $this->sortedBy = $value;
+                }
+                if ($key == 'page') {
+                    $this->page = $value;
                 }
 
-                if (!empty($attributes['select'])) {
-                    $this->select = $attributes['select'];
+                if ($key == 'page_size') {
+                    $this->pageSize = $value;
                 }
 
-                if (!empty($attributes['where_or'])) {
-                    $this->whereOr = $attributes['where_or'];
+                if ($key == 'select') {
+                    $this->select = $value;
+                }
+
+                if ($key == 'where_or') {
+                    $this->whereOr = $value;
                 }
             }
         }

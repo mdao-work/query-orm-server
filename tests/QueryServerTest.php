@@ -122,7 +122,7 @@ class QueryServerTest extends TestCase
         $queryServer = QueryServer::create();
         $queryServer->addSelect(['sex_or', 'age', 'text as b']);
         $queryServerArray = $queryServer->toArray();
-        $this->assertEquals(["sex_or", "age"], $queryServerArray['select']);
+        $this->assertEquals(["sex_or", "age","text as b"], $queryServerArray['select']);
 
     }
 }

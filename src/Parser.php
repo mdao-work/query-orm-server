@@ -40,11 +40,14 @@ class Parser
 
         $params = $parserEntityContract->apply($param);
 
+
         $filter = $params[$this->filter] ?? [];
 
         $filter = $this->where($filter);
 
         $whereOr = $params[$this->whereOr] ?? [];
+        dump($params);
+        dd($this->whereOr);
         $whereOr = $this->where($whereOr);
 
         $orderBy = $params[$this->orderBy] ?? 'id';
@@ -58,7 +61,6 @@ class Parser
         $pageSize = $params[$this->pageSize] ?? 15;
 
         $pagination = $this->pagination($page, $pageSize);
-
         $select = $params[$this->select] ?? '';
         $select = trim($select, ',');
         $select = $this->select($select);
