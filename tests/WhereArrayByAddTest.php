@@ -6,6 +6,8 @@ use mdao\QueryOrmServer\Exception\ParserException;
 use \PHPUnit\Framework\TestCase;
 use mdao\QueryOrmServer\Servers\QueryServer;
 use mdao\QueryOrmServer\Entities\OrmEntity;
+use mdao\QueryOrmServer\Config;
+
 
 class WhereArrayByAddTest extends TestCase
 {
@@ -14,6 +16,9 @@ class WhereArrayByAddTest extends TestCase
      */
     public function testParserAdd()
     {
+
+        dd(Config);
+
         $data = [
             'filter' => [
             ],

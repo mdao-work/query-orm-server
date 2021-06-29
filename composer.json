@@ -23,7 +23,10 @@
   "autoload": {
     "psr-4": {
       "mdao\\QueryOrmServer\\": "src/"
-    }
+    },
+    "files": [
+      "src/resources/config.php"
+    ]
   },
   "autoload-dev": {
     "psr-4": {

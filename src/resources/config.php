@@ -1,5 +1,8 @@
 <?php
 
+namespace mdao\QueryOrmServer\Config;
+
+
 return [
     'param' => [
         'filter' => 'filter',
@@ -10,5 +13,4 @@ return [
         'page_size' => 'page_size',
         'select' => 'select',
     ],
-
 ];
