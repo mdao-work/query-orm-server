@@ -30,6 +30,7 @@ class QueryServer implements QueryServerContract, Arrayable
         $this->ormEntity = $ormEntity;
         $this->parserDataEntity = new ParserDataEntity();
         $this->parser = new Parser();
+        $this->parser->setConfig($this->ormEntity->getConfig());
     }
 
     /**

@@ -82,57 +82,57 @@ class Config
     }
 
     /**
-     * @return mixed|string
+     * @return string
      */
-    public function getFilter()
+    public function getFilter(): string
     {
         return $this->filter;
     }
 
     /**
-     * @return mixed|string
+     * @return string
      */
-    public function getWhereOr()
+    public function getWhereOr(): string
     {
         return $this->whereOr;
     }
 
     /**
-     * @return mixed|string
+     * @return string
      */
-    public function getOrderBy()
+    public function getOrderBy(): string
     {
         return $this->orderBy;
     }
 
     /**
-     * @return mixed|string
+     * @return string
      */
-    public function getSortedBy()
+    public function getSortedBy(): string
     {
         return $this->sortedBy;
     }
 
     /**
-     * @return mixed|string
+     * @return string
      */
-    public function getPage()
+    public function getPage(): string
     {
         return $this->page;
     }
 
     /**
-     * @return mixed|string
+     * @return string
      */
-    public function getPageSize()
+    public function getPageSize(): string
     {
         return $this->pageSize;
     }
 
     /**
-     * @return mixed|string
+     * @return string
      */
-    public function getSelect()
+    public function getSelect(): string
     {
         return $this->select;
     }

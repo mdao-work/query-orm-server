@@ -18,6 +18,17 @@ class Parser
     protected $pageSize = 'page_size';
     protected $select = 'select';
 
+    public function setConfig(Config $config)
+    {
+        $this->filter = $config->getFilter();
+        $this->orderBy = $config->getOrderBy();
+        $this->sortedBy = $config->getSortedBy();
+        $this->page = $config->getPage();
+        $this->pageSize = $config->getPageSize();
+        $this->select = $config->getSelect();
+        $this->whereOr = $config->getWhereOr();
+    }
+
     /**
      * @param ParserEntityContract $parserEntityContract
      * @param $param

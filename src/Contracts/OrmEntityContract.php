@@ -88,7 +88,6 @@ interface OrmEntityContract
      */
     public function setSelect($select): void;
 
-
     public function addFilter(QueryWhere $queryWhere);
 
     public function addWhereOr(QueryWhereOr $queryWhereOr);
@@ -96,4 +95,6 @@ interface OrmEntityContract
     public function addOrder(QueryOrderBy $queryOrderBy);
 
     public function addSelect(QuerySelect $querySelect);
+
+    public function getConfig();
 }

@@ -41,6 +41,13 @@ class OrmEntity implements OrmEntityContract
     protected $select = '';
 
     /**
+     * @var Config
+     */
+    protected $config;
+
+
+
+    /**
      * OrmEntity constructor.
      * @param array $filter
      * @param string|null $orderBy
@@ -49,6 +56,7 @@ class OrmEntity implements OrmEntityContract
      * @param int|null $pageSize
      * @param string $select
      * @param array $whereOr
+     * @param Config|null $config
      */
     public function __construct(
         array $filter = [],
@@ -57,7 +65,8 @@ class OrmEntity implements OrmEntityContract
         ?int $page = null,
         ?int $pageSize = null,
         string $select = '',
-        array $whereOr = []
+        array $whereOr = [],
+        ?Config $config = null
     )
     {
         $this->filter = $filter;
@@ -67,28 +76,31 @@ class OrmEntity implements OrmEntityContract
         $this->page = $page;
         $this->pageSize = $pageSize;
         $this->select = $select;
+        $this->config = $config;
     }
 
     /**
      * 根据规则创建一个新的实体
      * @param $attributes
-     * @return static
+     * @param array $config
+     * @return OrmEntity|static
      */
     public static function createEntity($attributes, $config = [])
     {
 
         $config = new Config($config);
 
-        $filter = $attributes['filter'] ?? [];
+        $filter = $attributes[$config->getFilter()] ?? [];
         if (is_string($filter)) {
             $filter = json_decode($filter, true);
         }
-        $orderBy = $attributes['order_by'] ?? null;
-        $sortedBy = $attributes['sorted_by'] ?? null;
-        $page = $attributes['page'] ?? null;
-        $pageSize = $attributes['page_size'] ?? null;
-        $select = $attributes['select'] ?? '';
-        $whereOr = $attributes['where_or'] ?? [];
+        $orderBy = $attributes[$config->getOrderBy()] ?? null;
+        $sortedBy = $attributes[$config->getSortedBy()] ?? null;
+        $page = $attributes[$config->getPage()] ?? null;
+        $pageSize = $attributes[$config->getPageSize()] ?? null;
+        $select = $attributes[$config->getSelect()] ?? null;
+        $whereOr = $attributes[$config->getWhereOr()] ?? null;
+
         if (is_string($whereOr)) {
             $whereOr = json_decode($whereOr, true);
         }
@@ -98,9 +110,8 @@ class OrmEntity implements OrmEntityContract
         if (is_array($sortedBy)) {
             $sortedBy = implode(',', $sortedBy);
         }
-        return new static($filter, $orderBy, $sortedBy, $page, $pageSize, $select, $whereOr);
+        return new static($filter, $orderBy, $sortedBy, $page, $pageSize, $select, $whereOr, $config);
     }
-
 
 
     /**
@@ -250,4 +261,13 @@ class OrmEntity implements OrmEntityContract
         $selects = array_unique($selects);
         $this->select = trim(implode(',', $selects), ',');
     }
+
+    /**
+     * @return Config
+     */
+    public function getConfig(): ?Config
+    {
+        return $this->config;
+    }
+
 }
