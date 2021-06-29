@@ -3,6 +3,7 @@
 
 namespace mdao\QueryOrmServer\Entities;
 
+use mdao\QueryOrmServer\Config;
 use mdao\QueryOrmServer\Contracts\OrmEntityContract;
 
 class OrmEntity implements OrmEntityContract
@@ -57,7 +58,8 @@ class OrmEntity implements OrmEntityContract
         ?int $pageSize = null,
         string $select = '',
         array $whereOr = []
-    ) {
+    )
+    {
         $this->filter = $filter;
         $this->whereOr = $whereOr;
         $this->orderBy = $orderBy;
@@ -72,8 +74,11 @@ class OrmEntity implements OrmEntityContract
      * @param $attributes
      * @return static
      */
-    public static function createEntity($attributes)
+    public static function createEntity($attributes, $config = [])
     {
+
+        $config = new Config($config);
+
         $filter = $attributes['filter'] ?? [];
         if (is_string($filter)) {
             $filter = json_decode($filter, true);
@@ -95,6 +100,8 @@ class OrmEntity implements OrmEntityContract
         }
         return new static($filter, $orderBy, $sortedBy, $page, $pageSize, $select, $whereOr);
     }
+
+
 
     /**
      * @return array

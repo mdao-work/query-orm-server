@@ -17,8 +17,6 @@ class WhereArrayByAddTest extends TestCase
     public function testParserAdd()
     {
 
-        dd(Config);
-
         $data = [
             'filter' => [
             ],
