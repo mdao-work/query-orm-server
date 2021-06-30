@@ -4,106 +4,75 @@
 namespace mdao\QueryOrmServer\Entities;
 
 use mdao\QueryOrmServer\Config;
+use mdao\QueryOrmServer\Contracts\Arrayable;
 use mdao\QueryOrmServer\Contracts\OrmEntityContract;
+use mdao\QueryOrmServer\Parser;
 
-class OrmEntity implements OrmEntityContract
+class OrmEntity implements Arrayable
 {
     /**
-     * @var array
+     * @var QuerySelect
      */
-    protected $filter = [];
+    protected $select;
 
     /**
-     * @var array
+     * @var QueryWheres
      */
-    protected $whereOr = [];
+    protected $filter;
 
     /**
-     * @var string|null
+     * @var QueryWhereOrs
      */
-    protected $orderBy;
-    /**
-     * @var string|null
-     */
-    protected $sortedBy;
-    /**
-     * @var int
-     */
-    protected $page;
-    /**
-     * @var int
-     */
-    protected $pageSize;
+    protected $whereOr;
 
     /**
-     * @var string
+     * @var QueryOrderBys
      */
-    protected $select = '';
+    protected $order;
+
+    /**
+     * @var QueryPagination
+     */
+    protected $pagination;
 
     /**
      * @var Config
      */
     protected $config;
 
+    protected $parser;
 
     /**
      * OrmEntity constructor.
-     * @param array $filter
-     * @param string|null $orderBy
-     * @param string|null $sortedBy
-     * @param int|null $page
-     * @param int|null $pageSize
-     * @param string $select
-     * @param array $whereOr
-     * @param Config|null $config
-     */
-    public function __construct(
-        array $filter = [],
-        string $orderBy = null,
-        string $sortedBy = null,
-        ?int $page = null,
-        ?int $pageSize = null,
-        ?string $select = '',
-        array $whereOr = [],
-        ?Config $config = null
-    )
-    {
-        $this->filter = $filter;
-        $this->whereOr = $whereOr;
-        $this->orderBy = $orderBy;
-        $this->sortedBy = $sortedBy;
-        $this->page = $page;
-        $this->pageSize = $pageSize;
-        $this->select = $select;
-        $this->config = $config;
-    }
-
-    /**
-     * 根据规则创建一个新的实体
      * @param $attributes
      * @param array $config
-     * @return OrmEntity|static
+     * @throws \mdao\QueryOrmServer\Exception\ParserException
      */
-    public static function createEntity($attributes, $config = [])
+    public function __construct($attributes, $config = [])
     {
 
-        $config = new Config($config);
+        $this->config = new Config($config);
+        $this->parser = new Parser();
+        $filter = $attributes[$this->config->getFilter()] ?? [];
 
-
-        $filter = $attributes[$config->getFilter()] ?? [];
         if (is_string($filter)) {
             $filter = json_decode($filter, true);
         }
-        $orderBy = $attributes[$config->getOrderBy()] ?? null;
-        $sortedBy = $attributes[$config->getSortedBy()] ?? null;
-        $page = $attributes[$config->getPage()] ?? null;
-        $pageSize = $attributes[$config->getPageSize()] ?? null;
-        $select = $attributes[$config->getSelect()] ?? '';
-        $whereOr = $attributes[$config->getWhereOr()] ?? [];
+
+        $filter = $this->parser->where($filter);
+
+
+        $whereOr = $attributes[$this->config->getWhereOr()] ?? [];
 
         if (is_string($whereOr)) {
             $whereOr = json_decode($whereOr, true);
         }
+
+        $whereOr = $this->parser->where($whereOr);
+
+        $orderBy = $attributes[$this->config->getOrderBy()] ?? 'id';
+        $sortedBy = $attributes[$this->config->getSortedBy()] ?? 'desc';
+
         if (is_array($orderBy)) {
             $orderBy = implode(',', $orderBy);
         }
@@ -111,114 +80,161 @@ class OrmEntity implements OrmEntityContract
             $sortedBy = implode(',', $sortedBy);
         }
 
-        return new static($filter, $orderBy, $sortedBy, $page, $pageSize, $select, $whereOr, $config);
+        $order = [];
+        if (!empty($orderBy)) {
+            $order = $this->parser->order($orderBy, $sortedBy);
+        }
+
+        $page = $attributes[$this->config->getPage()] ?? 0;
+        $pageSize = $attributes[$this->config->getPageSize()] ?? 0;
+        $pagination = [];
+        if ($page != 0) {
+            $pagination = $this->parser->pagination($page, $pageSize);
+        }
+
+        $select = $attributes[$this->config->getSelect()] ?? '';
+
+        if (!empty($select)) {
+            $select = trim($select, ',');
+        }
+
+        $select = $this->parser->select($select);
+
+        $this->init($filter, $select, $order, $pagination, $whereOr);
+    }
+
+    /**
+     * 根据规则创建一个新的实体
+     * @param $attributes
+     * @param array $config
+     * @return static
+     * @throws \mdao\QueryOrmServer\Exception\ParserException
+     */
+    public static function createEntity($attributes, $config = [])
+    {
+        return new static($attributes, $config = []);
+    }
+
+    protected function init(
+        array $filter = [],
+        array $select = [],
+        array $order = [],
+        array $pagination = [],
+        array $whereOr = []
+    )
+    {
+        if (!empty($filter)) {
+            $this->setFilter($filter);
+        }
+
+        if (!empty($whereOr)) {
+            $this->setWhereOr($whereOr);
+        }
+
+        if (!empty($order)) {
+            $this->setOrder($order);
+        }
+
+        if (!empty($pagination)) {
+            $this->setPagination($pagination);
+        }
+
+        $this->setSelect($select);
     }
 
 
     /**
-     * @return array
+     * @return QueryWheres
      */
-    public function getFilter(): array
+    public function getFilter()
     {
         return $this->filter;
     }
 
     /**
      * @param array $filter
+     * @return $this
      */
-    public function setFilter(array $filter): void
+    public function setFilter(array $filter): self
     {
-        $this->filter = $filter;
+        $this->filter = QueryWheres::createFilters($filter);
+        return $this;
     }
 
     /**
-     * @return string|null
+     * @return QueryWhereOrs
      */
-    public function getOrderBy(): ?string
+    public function getWhereOr()
     {
-        return $this->orderBy;
+        return $this->whereOr;
     }
 
     /**
-     * @param string $orderBy
+     * @param array $filter
+     * @return $this
      */
-    public function setOrderBy(string $orderBy): void
+    public function setWhereOr(array $filter): self
     {
-        $this->orderBy = $orderBy;
+        $this->whereOr = QueryWhereOrs::createFilters($filter);
+        return $this;
     }
 
     /**
-     * @return string|null
+     * @return QueryOrderBys
      */
-    public function getSortedBy(): ?string
+    public function getOrder(): QueryOrderBys
     {
-        return $this->sortedBy;
+        return $this->order;
+    }
+
+
+    /**
+     * @param array $order
+     * @return $this
+     */
+    public function setOrder(array $order): self
+    {
+        $this->order = QueryOrderBys::create($order);
+        return $this;
     }
 
     /**
-     * @param string $sortedBy
+     * @return QueryPagination
      */
-    public function setSortedBy(string $sortedBy): void
+    public function getPagination()
     {
-        $this->sortedBy = $sortedBy;
+        return $this->pagination;
+    }
+
+
+    /**
+     * @param array $pagination
+     * @return $this
+     */
+    public function setPagination(array $pagination): self
+    {
+        list($page, $pageSize) = $pagination;
+        $this->pagination = new QueryPagination($page, $pageSize);
+        return $this;
     }
 
     /**
-     * @return int|null
+     * @return QuerySelect
      */
-    public function getPage(): ?int
-    {
-        return $this->page;
-    }
-
-    /**
-     * @param int $page
-     */
-    public function setPage(int $page): void
-    {
-        $this->page = $page;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getPageSize(): ?int
-    {
-        return $this->pageSize;
-    }
-
-    /**
-     * @param int $pageSize
-     */
-    public function setPageSize(int $pageSize): void
-    {
-        $this->pageSize = $pageSize;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSelect(): string
+    public function getSelect()
     {
         return $this->select;
     }
 
     /**
-     * @param mixed $select
+     * @param array $select
+     * @return $this
      */
-    public function setSelect($select): void
+    public function setSelect(array $select): self
     {
-        $this->select = $select;
-    }
+        $this->select = new QuerySelect($select);
 
-    public function getWhereOr(): array
-    {
-        return $this->whereOr;
-    }
-
-    public function setWhereOr(array $whereOr): void
-    {
-        $this->whereOr = $whereOr;
+        return $this;
     }
 
     public function addFilter(QueryWhere $queryWhere)
@@ -227,12 +243,20 @@ class OrmEntity implements OrmEntityContract
         $this->filter[$field] = $queryWhere->getValue();
     }
 
+    /**
+     * 添加whereor
+     * @param QueryWhereOr $queryWhereOr
+     */
     public function addWhereOr(QueryWhereOr $queryWhereOr)
     {
         $field = $queryWhereOr->parserOperator();
         $this->whereOr[$field] = $queryWhereOr->getValue();
     }
 
+    /**
+     * 添加排序
+     * @param QueryOrderBy $queryOrderBy
+     */
     public function addOrder(QueryOrderBy $queryOrderBy)
     {
         $orderBy = $this->orderBy ?? '';
@@ -249,6 +273,10 @@ class OrmEntity implements OrmEntityContract
         $this->sortedBy = trim(implode(',', $sortedBys), ',');
     }
 
+    /**
+     * 添加字段
+     * @param QuerySelect $querySelect
+     */
     public function addSelect(QuerySelect $querySelect)
     {
         $select = $this->select ?? '';
@@ -270,5 +298,4 @@ class OrmEntity implements OrmEntityContract
     {
         return $this->config;
     }
-
 }
