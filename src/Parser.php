@@ -38,6 +38,7 @@ class Parser
         $page = $params[$config->getPage()] ?? null;
         $pageSize = $params[$config->getPageSize()] ?? null;
         $pagination = null;
+
         if (!is_null($page) && !is_null($pageSize) && $page != '' && $pageSize != '') {
             $pagination = $this->pagination($page, $pageSize);
         }

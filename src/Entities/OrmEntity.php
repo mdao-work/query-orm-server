@@ -74,7 +74,9 @@ class OrmEntity
         if (!empty($result['pagination'])) {
             $this->setPagination($result['pagination']);
         }
+
         if (!empty($result['select'])) {
+
             $this->setSelect($result['select']);
         }
     }
@@ -88,7 +90,7 @@ class OrmEntity
      */
     public static function createEntity($attributes, $config = [])
     {
-        return new static($attributes, $config = []);
+        return new static($attributes, $config);
     }
 
     /**
@@ -147,9 +149,9 @@ class OrmEntity
     }
 
     /**
-     * @return QueryPagination
+     * @return QueryPagination|null
      */
-    public function getPagination()
+    public function getPagination(): ?QueryPagination
     {
         return $this->pagination;
     }
