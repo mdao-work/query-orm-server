@@ -4,57 +4,46 @@
 namespace mdao\QueryOrmServer\Servers;
 
 use mdao\QueryOrmServer\Contracts\Arrayable;
-use mdao\QueryOrmServer\Contracts\OrmEntityContract;
+
 use mdao\QueryOrmServer\Contracts\QueryServerContract;
 use mdao\QueryOrmServer\Entities\OrmEntity;
-use mdao\QueryOrmServer\Entities\ParserDataEntity;
+
 use mdao\QueryOrmServer\Entities\QueryOrderBys;
 use mdao\QueryOrmServer\Entities\QueryWhere;
+use mdao\QueryOrmServer\Entities\QueryWhereExp;
 use mdao\QueryOrmServer\Entities\QueryWhereOr;
 use mdao\QueryOrmServer\Entities\QueryWhereOrs;
 use mdao\QueryOrmServer\Entities\QueryWheres;
 use mdao\QueryOrmServer\Entities\QueryOrderBy;
 use mdao\QueryOrmServer\Entities\QueryPagination;
 use mdao\QueryOrmServer\Entities\QuerySelect;
+use mdao\QueryOrmServer\Entities\QueryWhereTime;
 use mdao\QueryOrmServer\Exception\ParserException;
-use mdao\QueryOrmServer\Parser;
+
 
 class QueryServer implements QueryServerContract, Arrayable
 {
     protected $ormEntity;
-    protected $parserDataEntity;
-    protected $parser;
 
-    public function __construct(OrmEntityContract $ormEntity)
+    public function __construct(OrmEntity $ormEntity)
     {
         $this->ormEntity = $ormEntity;
-        $this->parserDataEntity = new ParserDataEntity();
-        $this->parser = new Parser();
-        if ($config = $this->ormEntity->getConfig()) {
-            $this->parser->setConfig($config);
-        }
     }
 
     /**
-     * @param array $data 创建一个 空的QueryServer 对象
-     * @return static
+     * 创建一个 空的QueryServer 对象
+     * @param array $data
+     * @return QueryServer
+     * @throws ParserException
      */
     public static function create(array $data = []): QueryServer
     {
         return new static(OrmEntity::createEntity($data));
     }
 
-    /**
-     * @return QueryWheres
-     * @throws ParserException
-     */
     public function getQueryWheres(): ?QueryWheres
     {
-        if ($this->ormEntity->getFilter()) {
-            $result = $this->parser->apply($this->parserDataEntity, [
-                'filter' => $this->ormEntity->getFilter()
-            ])->getFilter();
-
+        if ($result = $this->ormEntity->getFilter()) {
             return empty($result) ? null : $result;
         }
         return null;
@@ -62,69 +51,42 @@ class QueryServer implements QueryServerContract, Arrayable
 
     public function getQueryWhereOrs(): ?QueryWhereOrs
     {
-        if ($this->ormEntity->getWhereOr()) {
-            $result = $this->parser->apply($this->parserDataEntity, [
-                'where_or' => $this->ormEntity->getWhereOr()
-            ])->getWhereOr();
+        if ($result = $this->ormEntity->getWhereOr()) {
             return empty($result) ? null : $result;
         }
         return null;
     }
 
-    /**
-     * @return QueryOrderBys|null
-     * @throws ParserException
-     */
     public function getQueryOrderBy(): ?QueryOrderBys
     {
-        if ($this->ormEntity->getOrderBy()) {
-            return $this->parser->apply($this->parserDataEntity, [
-                'order_by' => $this->ormEntity->getOrderBy(),
-                'sorted_by' => $this->ormEntity->getSortedBy(),
-            ])
-                ->getOrder();
-        }
-        return null;
+        return $this->ormEntity->getOrder();
     }
 
     public function getQueryPagination(): ?QueryPagination
     {
-
-        if ($result = $this->ormEntity->getPage()) {
-            return $this->parser->apply($this->parserDataEntity, [
-                'page' => $result,
-                'page_size' => $this->ormEntity->getPageSize(),
-            ])
-                ->getPagination();
-        }
-        return null;
+        return $this->ormEntity->getPagination();
     }
 
-    /**
-     * @return QuerySelect|null
-     * @throws ParserException
-     */
+
     public function getQuerySelect(): ?QuerySelect
     {
-        if ($result = $this->ormEntity->getSelect()) {
-            return $this->parser->apply($this->parserDataEntity, [
-                'select' => $result,
-            ])
-                ->getSelect();
-        }
-        return null;
+        return $this->ormEntity->getSelect();
     }
 
-    /**
-     * @param string $key
-     * @param string $operation
-     * @param null $value
-     * @return $this
-     */
-    public function where(string $key, string $operation, $value = null): QueryServer
+
+    public function where($key, ?string $operation = null, $value = null): QueryServer
     {
-        $queryWhere = new QueryWhere($key, $operation, $value);
-        $this->ormEntity->addFilter($queryWhere);
+        //批量数组模式
+        if (is_array($key)) {
+            foreach ($key as $val) {
+                list($filed, $operation, $value) = $val;
+                $queryWhere = new QueryWhere($filed, $operation, $value);
+                $this->ormEntity->addFilter($queryWhere);
+            }
+        } else {
+            $queryWhere = new QueryWhere($key, $operation, $value);
+            $this->ormEntity->addFilter($queryWhere);
+        }
         return $this;
     }
 
@@ -165,17 +127,31 @@ class QueryServer implements QueryServerContract, Arrayable
     }
 
     /**
+     * 查询日期或者时间范围
+     * @param string $field 字段
+     * @param string|int $startTime
+     * @param string|null $endTime
+     * @return $this
+     */
+    public function whereBetweenTime(string $field, $startTime, ?string $endTime = null): QueryServer
+    {
+        if (is_null($endTime)) {
+            $time = is_string($startTime) ? strtotime($startTime) : $startTime;
+            $endTime = strtotime('+1 day', $time);
+        }
+        $queryWhere = new QueryWhereTime($field, 'between', [$startTime, $endTime]);
+        $this->ormEntity->addFilter($queryWhere);
+        return $this;
+    }
+
+    /**
      * 现在使用的是一个比较笨的方式，拿出所有的条件，然后再重新写入，以后优化
      * @param string $key
      * @return $this
-     * @throws ParserException
      */
     public function removeWhere(string $key): QueryServer
     {
-        if ($this->ormEntity->getFilter()) {
-            $result = $this->parser->apply($this->parserDataEntity, [
-                'filter' => $this->ormEntity->getFilter()
-            ])->getFilter();
+        if ($result = $this->ormEntity->getFilter()) {
 
             $this->ormEntity->setFilter([]);
 
@@ -245,14 +221,10 @@ class QueryServer implements QueryServerContract, Arrayable
      * 现在使用的是一个比较笨的方式，拿出所有的条件，然后再重新写入，以后优化
      * @param string $key
      * @return $this
-     * @throws ParserException
      */
     public function removeWhereOr(string $key): QueryServer
     {
-        if ($this->ormEntity->getWhereOr()) {
-            $result = $this->parser->apply($this->parserDataEntity, [
-                'filter' => $this->ormEntity->getWhereOr()
-            ])->getFilter();
+        if ($result = $this->ormEntity->getWhereOr()) {
 
             $this->ormEntity->setWhereOr([]);
 
@@ -299,15 +271,12 @@ class QueryServer implements QueryServerContract, Arrayable
      */
     public function page(int $pageSize, int $page = 10): QueryServer
     {
-        $queryPagination = (new QueryPagination($page, $pageSize));
-        $this->ormEntity->setPage($queryPagination->getPage());
-        $this->ormEntity->setPageSize($queryPagination->getPageSize());
+        $this->ormEntity->setPagination([$page, $pageSize]);
         return $this;
     }
 
     /**
      * @return array
-     * @throws ParserException
      */
     public function toArray(): array
     {

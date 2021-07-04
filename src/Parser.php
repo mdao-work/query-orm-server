@@ -3,69 +3,58 @@
 
 namespace mdao\QueryOrmServer;
 
+use mdao\QueryOrmServer\Entities\QueryWhereExp;
 use mdao\QueryOrmServer\Exception\ParserException;
-use mdao\QueryOrmServer\Entities\ParserEntity;
-use mdao\QueryOrmServer\Contracts\ParserEntityContract;
 
 class Parser
 {
-
-    protected $filter = 'filter';
-    protected $whereOr = 'where_or';
-    protected $orderBy = 'order_by';
-    protected $sortedBy = 'sorted_by';
-    protected $page = 'page';
-    protected $pageSize = 'page_size';
-    protected $select = 'select';
-
-    public function setConfig(Config $config)
-    {
-        $this->filter = $config->getFilter();
-        $this->orderBy = $config->getOrderBy();
-        $this->sortedBy = $config->getSortedBy();
-        $this->page = $config->getPage();
-        $this->pageSize = $config->getPageSize();
-        $this->select = $config->getSelect();
-        $this->whereOr = $config->getWhereOr();
-    }
-
     /**
-     * @param ParserEntityContract $parserEntityContract
-     * @param $param
-     * @return ParserEntity
+     * @param array $params
+     * @param Config $config
+     * @return array
      * @throws ParserException
      */
-    public function apply(ParserEntityContract $parserEntityContract, $param): ParserEntity
+    public function apply(array $params, Config $config): array
     {
+        $filter = $params[$config->getFilter()] ?? null;
 
-        $params = $parserEntityContract->apply($param);
+        if (!is_null($filter) && $filter != '') {
+            $filter = $this->where($filter);
+        }
 
+        $whereOr = $params[$config->getWhereOr()] ?? null;
 
-        $filter = $params[$this->filter] ?? [];
+        if (!is_null($whereOr) && $whereOr != '') {
+            $whereOr = $this->where($whereOr);
+        }
 
-        $filter = $this->where($filter);
-
-        $whereOr = $params[$this->whereOr] ?? [];
-        dump($params);
-        dd($this->whereOr);
-        $whereOr = $this->where($whereOr);
-
-        $orderBy = $params[$this->orderBy] ?? 'id';
-        $sortedBy = $params[$this->sortedBy] ?? 'desc';
-        $order = [];
-        if (!empty($orderBy)) {
+        $orderBy = $params[$config->getOrderBy()] ?? null;
+        $sortedBy = $params[$config->getSortedBy()] ?? null;
+        $order = null;
+        if (!is_null($orderBy) && !is_null($sortedBy) && $orderBy != '' && $sortedBy != '') {
             $order = $this->order($orderBy, $sortedBy);
         }
 
-        $page = $params[$this->page] ?? 1;
-        $pageSize = $params[$this->pageSize] ?? 15;
+        $page = $params[$config->getPage()] ?? null;
+        $pageSize = $params[$config->getPageSize()] ?? null;
+        $pagination = null;
+        if (!is_null($page) && !is_null($pageSize) && $page != '' && $pageSize != '') {
+            $pagination = $this->pagination($page, $pageSize);
+        }
 
-        $pagination = $this->pagination($page, $pageSize);
-        $select = $params[$this->select] ?? '';
-        $select = trim($select, ',');
-        $select = $this->select($select);
+        $select = $params[$config->getSelect()] ?? null;
+        if (!is_null($select) && $select != '') {
+            $select = trim($select, ',');
+            $select = $this->select($select);
+        }
 
-        return new ParserEntity($filter, $select, $order, $pagination, $whereOr);
+        return [
+            'where' => $filter,
+            'where_or' => $whereOr,
+            'order' => $order,
+            'pagination' => $pagination,
+            'select' => $select
+        ];
     }
 
     /**
@@ -87,81 +76,12 @@ class Parser
     }
 
     /**
-     *filed[~] like
-     *filed[in] in
-     *field[!] !=
-     *field[=] =
-     *field[>] >
-     *field[>=] >=
-     *field[<] <
-     *field[<=] <=
-     *field[<>] BETWEEN
-     *field[><] NOT BETWEEN
      * @param array $values
      * @return array
      */
     public function where(array $values): array
     {
-        $where = [];
-        $regexp = '/([a-zA-Z0-9_\.]+)(\{(?<operator>|eq|neq|gt|egt|lt|elt|like|in|between|not_in|not_between|\!?~)\})?/i';
-
-        foreach ($values as $field => $value) {
-            preg_match($regexp, "[{$field}]", $match);
-            $operator = $match['operator'] ?? '';
-            $operator = $this->operator($operator);
-
-            //是否字符串数组，是字符串数组，转换成数组
-            $tempValue = $this->stringArrayConvertToArray($value);
-            if (is_array($value) || !empty($tempValue)) {
-                $operator = 'in';
-                $value = empty($tempValue) ? $value : $tempValue;
-            }
-
-            $where[] = [$match[1], $operator, $value];
-        }
-        return $where;
-    }
-
-    /**
-     * @param string $value
-     * @return string
-     */
-    public function operator(string $value): string
-    {
-        switch ($value) {
-            case "in":
-                $operator = 'in';
-                break;
-            case "like":
-                $operator = 'like';
-                break;
-            case "neq":
-                $operator = '<>';
-                break;
-            case "lt":
-                $operator = '<';
-                break;
-            case "elt":
-                $operator = '<=';
-                break;
-            case "gt":
-                $operator = '>';
-                break;
-            case "egt":
-                $operator = '>=';
-                break;
-            case "between":
-                $operator = 'between';
-                break;
-            case "not_between":
-                $operator = 'not between';
-                break;
-            case "eq":
-            default:
-                $operator = '=';
-                break;
-        }
-        return $operator;
+        return (new QueryWhereExp())->where($values);
     }
 
     /**
@@ -218,28 +138,5 @@ class Parser
         }
 
         throw new ParserException('error');
-    }
-
-    /**
-     * 字符串、数组转换为格式化的数组
-     * @param string $data 原始字符串
-     * @return array
-     */
-    private function stringArrayConvertToArray(string $data): array
-    {
-        // 数组原样返回
-        if (is_array($data)) {
-            return $data;
-        }
-        $result = [];
-        // 字符串处理
-        $string = (string)$data;
-        if (!empty($string) && preg_match('/^\[.*?]$/', $string)) {
-            $result = json_decode($string, true);
-        }
-        if (!is_array($result) || count($result) < 1) {
-            return [];
-        }
-        return $result;
     }
 }

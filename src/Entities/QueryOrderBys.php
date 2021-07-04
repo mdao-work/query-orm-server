@@ -107,7 +107,7 @@ class QueryOrderBys implements \JsonSerializable, \ArrayAccess, \Iterator, \Coun
      */
     public function __set($name, $value)
     {
-        $this->setData([[$name, $value]]);
+        $this->setData([$name, $value]);
     }
 
     /**
@@ -166,7 +166,7 @@ class QueryOrderBys implements \JsonSerializable, \ArrayAccess, \Iterator, \Coun
     // ArrayAccess
     public function offsetSet($name, $value)
     {
-        $this->setFilter($name, $value);
+        $this->data[$name]=$value;
     }
 
     public function offsetExists($name): bool

@@ -6,9 +6,10 @@ namespace mdao\QueryOrmServer\Entities;
 use mdao\QueryOrmServer\Config;
 use mdao\QueryOrmServer\Contracts\Arrayable;
 use mdao\QueryOrmServer\Contracts\OrmEntityContract;
+use mdao\QueryOrmServer\Exception\ParserException;
 use mdao\QueryOrmServer\Parser;
 
-class OrmEntity implements Arrayable
+class OrmEntity
 {
     /**
      * @var QuerySelect
@@ -40,67 +41,42 @@ class OrmEntity implements Arrayable
      */
     protected $config;
 
+    /**
+     * @var Parser
+     */
     protected $parser;
 
     /**
      * OrmEntity constructor.
      * @param $attributes
      * @param array $config
-     * @throws \mdao\QueryOrmServer\Exception\ParserException
+     * @throws ParserException
      */
     public function __construct($attributes, $config = [])
     {
-
         $this->config = new Config($config);
         $this->parser = new Parser();
-        $filter = $attributes[$this->config->getFilter()] ?? [];
 
-        if (is_string($filter)) {
-            $filter = json_decode($filter, true);
+        $result = $this->parser->apply($attributes, $this->config);
+
+        if (!empty($result['where'])) {
+            $this->setFilter($result['where']);
         }
 
-        $filter = $this->parser->where($filter);
-
-
-        $whereOr = $attributes[$this->config->getWhereOr()] ?? [];
-
-        if (is_string($whereOr)) {
-            $whereOr = json_decode($whereOr, true);
+        if (!empty($result['where_or'])) {
+            $this->setWhereOr($result['where_or']);
         }
 
-        $whereOr = $this->parser->where($whereOr);
-
-        $orderBy = $attributes[$this->config->getOrderBy()] ?? 'id';
-        $sortedBy = $attributes[$this->config->getSortedBy()] ?? 'desc';
-
-        if (is_array($orderBy)) {
-            $orderBy = implode(',', $orderBy);
-        }
-        if (is_array($sortedBy)) {
-            $sortedBy = implode(',', $sortedBy);
+        if (!empty($result['order'])) {
+            $this->setOrder($result['order']);
         }
 
-        $order = [];
-        if (!empty($orderBy)) {
-            $order = $this->parser->order($orderBy, $sortedBy);
+        if (!empty($result['pagination'])) {
+            $this->setPagination($result['pagination']);
         }
-
-        $page = $attributes[$this->config->getPage()] ?? 0;
-        $pageSize = $attributes[$this->config->getPageSize()] ?? 0;
-        $pagination = [];
-        if ($page != 0) {
-            $pagination = $this->parser->pagination($page, $pageSize);
+        if (!empty($result['select'])) {
+            $this->setSelect($result['select']);
         }
-
-        $select = $attributes[$this->config->getSelect()] ?? '';
-
-        if (!empty($select)) {
-            $select = trim($select, ',');
-        }
-
-        $select = $this->parser->select($select);
-
-        $this->init($filter, $select, $order, $pagination, $whereOr);
     }
 
     /**
@@ -108,45 +84,17 @@ class OrmEntity implements Arrayable
      * @param $attributes
      * @param array $config
      * @return static
-     * @throws \mdao\QueryOrmServer\Exception\ParserException
+     * @throws ParserException
      */
     public static function createEntity($attributes, $config = [])
     {
         return new static($attributes, $config = []);
     }
 
-    protected function init(
-        array $filter = [],
-        array $select = [],
-        array $order = [],
-        array $pagination = [],
-        array $whereOr = []
-    )
-    {
-        if (!empty($filter)) {
-            $this->setFilter($filter);
-        }
-
-        if (!empty($whereOr)) {
-            $this->setWhereOr($whereOr);
-        }
-
-        if (!empty($order)) {
-            $this->setOrder($order);
-        }
-
-        if (!empty($pagination)) {
-            $this->setPagination($pagination);
-        }
-
-        $this->setSelect($select);
-    }
-
-
     /**
-     * @return QueryWheres
+     * @return QueryWheres|null ?QueryWheres
      */
-    public function getFilter()
+    public function getFilter(): ?QueryWheres
     {
         return $this->filter;
     }
@@ -162,9 +110,9 @@ class OrmEntity implements Arrayable
     }
 
     /**
-     * @return QueryWhereOrs
+     * @return QueryWhereOrs|null
      */
-    public function getWhereOr()
+    public function getWhereOr(): ?QueryWhereOrs
     {
         return $this->whereOr;
     }
@@ -180,9 +128,9 @@ class OrmEntity implements Arrayable
     }
 
     /**
-     * @return QueryOrderBys
+     * @return QueryOrderBys|null
      */
-    public function getOrder(): QueryOrderBys
+    public function getOrder(): ?QueryOrderBys
     {
         return $this->order;
     }
@@ -206,7 +154,6 @@ class OrmEntity implements Arrayable
         return $this->pagination;
     }
 
-
     /**
      * @param array $pagination
      * @return $this
@@ -219,9 +166,9 @@ class OrmEntity implements Arrayable
     }
 
     /**
-     * @return QuerySelect
+     * @return QuerySelect|null
      */
-    public function getSelect()
+    public function getSelect(): ?QuerySelect
     {
         return $this->select;
     }
@@ -233,62 +180,67 @@ class OrmEntity implements Arrayable
     public function setSelect(array $select): self
     {
         $this->select = new QuerySelect($select);
+        return $this;
+    }
+
+    /**
+     * @param QueryWhere $queryWhere
+     * @return $this
+     */
+    public function addFilter(QueryWhere $queryWhere)
+    {
+        if (is_null($this->filter)) {
+            $this->filter = QueryWheres::createFilters();
+        }
+        $this->filter[$queryWhere->getField()] = $queryWhere;
 
         return $this;
     }
 
-    public function addFilter(QueryWhere $queryWhere)
-    {
-        $field = $queryWhere->parserOperator();
-        $this->filter[$field] = $queryWhere->getValue();
-    }
-
     /**
-     * 添加whereor
+     * 添加
      * @param QueryWhereOr $queryWhereOr
+     * @return $this
      */
     public function addWhereOr(QueryWhereOr $queryWhereOr)
     {
-        $field = $queryWhereOr->parserOperator();
-        $this->whereOr[$field] = $queryWhereOr->getValue();
+        if (is_null($this->whereOr)) {
+            $this->whereOr = QueryWhereOrs::createFilters();
+        }
+        $this->whereOr[$queryWhereOr->getField()] = $queryWhereOr;
+        return $this;
     }
 
     /**
      * 添加排序
      * @param QueryOrderBy $queryOrderBy
+     * @return $this
      */
     public function addOrder(QueryOrderBy $queryOrderBy)
     {
-        $orderBy = $this->orderBy ?? '';
-        $sortedBy = $this->sortedBy ?? '';
+        if (is_null($this->order)) {
+            $this->order = QueryOrderBys::create();
+        }
 
-        $orderBys = explode(',', $orderBy);
-        $sortedBys = explode(',', $sortedBy);
+        $this->order[$queryOrderBy->getColumn()] = $queryOrderBy;
 
-        $orderBys[] = $queryOrderBy->getColumn();
-        $sortedBys[] = $queryOrderBy->getDirection();
-        $orderBys = array_unique($orderBys);
-
-        $this->orderBy = trim(implode(',', $orderBys), ',');
-        $this->sortedBy = trim(implode(',', $sortedBys), ',');
+        return $this;
     }
 
     /**
      * 添加字段
      * @param QuerySelect $querySelect
+     * @return $this
      */
     public function addSelect(QuerySelect $querySelect)
     {
-        $select = $this->select ?? '';
-
-        $selects = explode(',', $select);
-        if (!empty($selects)) {
-            $selects = array_merge($selects, $querySelect->getSelect());
-        } else {
-            $selects = $querySelect->getSelect();
+        if (empty($this->select)) {
+            $this->select = $querySelect;
+            return $this;
         }
-        $selects = array_unique($selects);
-        $this->select = trim(implode(',', $selects), ',');
+        $selects = array_merge($this->select->toArray(), $querySelect->getSelect());
+        $this->select = (new QuerySelect($selects));
+        return $this;
     }
 
     /**
@@ -298,4 +250,5 @@ class OrmEntity implements Arrayable
     {
         return $this->config;
     }
+
 }

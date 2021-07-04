@@ -3,9 +3,6 @@
 
 namespace mdao\QueryOrmServer;
 
-use mdao\QueryOrmServer\Exception\ParserException;
-use mdao\QueryOrmServer\Entities\ParserEntity;
-use mdao\QueryOrmServer\Contracts\ParserEntityContract;
 
 /**
  * todo config 文件暂时简单处理，后续优化
@@ -14,15 +11,39 @@ use mdao\QueryOrmServer\Contracts\ParserEntityContract;
  */
 class Config
 {
-    protected $filter = 'filter';
-    protected $whereOr = 'where_or';
-    protected $orderBy = 'order_by';
-    protected $sortedBy = 'sorted_by';
-    protected $page = 'page';
-    protected $pageSize = 'page_size';
-    protected $select = 'select';
+    /**
+     * @var string
+     */
+    protected $filter;
+    /**
+     * @var string
+     */
+    protected $whereOr;
+    /**
+     * @var string
+     */
+    protected $orderBy;
+    /**
+     * @var string
+     */
+    protected $sortedBy;
+    /**
+     * @var string
+     */
+    protected $page;
+    /**
+     * @var string
+     */
+    protected $pageSize;
+    /**
+     * @var string
+     */
+    protected $select;
 
-    protected $param = [
+    /**
+     * @var array|string[]
+     */
+    protected $default = [
         'filter' => 'filter',
         'where_or' => 'where_or',
         'order_by' => 'order_by',
@@ -39,47 +60,37 @@ class Config
     public function __construct(array $param = [])
     {
         if (!empty($param['param'])) {
+            $this->default = array_merge($this->default, $param['param']);
+        }
 
-            $this->param = array_merge($this->param, $param['param']);
-            // 比较笨的办法
-            foreach ($this->param as $key => $value) {
-
-                if ($key == 'filter') {
+        // 比较笨的办法
+        foreach ($this->default as $key => $value) {
+            switch ($key) {
+                case 'filter':
                     $this->filter = $value;
-                }
-
-                if ($key == 'order_by') {
+                    break;
+                case 'order_by':
                     $this->orderBy = $value;
-                }
-                if ($key == 'sorted_by') {
+                    break;
+                case 'sorted_by':
                     $this->sortedBy = $value;
-                }
-                if ($key == 'page') {
+                    break;
+                case 'page':
                     $this->page = $value;
-                }
-
-                if ($key == 'page_size') {
+                    break;
+                case 'page_size':
                     $this->pageSize = $value;
-                }
-
-                if ($key == 'select') {
+                    break;
+                case 'select':
                     $this->select = $value;
-                }
-
-                if ($key == 'where_or') {
+                    break;
+                case 'where_or':
                     $this->whereOr = $value;
-                }
+                    break;
             }
         }
     }
 
-    /**
-     * @return array|string[]
-     */
-    public function getParam(): array
-    {
-        return $this->param;
-    }
 
     /**
      * @return string
@@ -136,5 +147,4 @@ class Config
     {
         return $this->select;
     }
-
 }
