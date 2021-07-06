@@ -112,6 +112,16 @@ class OrmEntity
     }
 
     /**
+     * @param \mdao\QueryOrmServer\Entities\QueryWheres|null $queryWheres
+     * @return $this
+     */
+    public function resetFilter(?QueryWheres $queryWheres=null): self
+    {
+        $this->filter = $queryWheres;
+        return $this;
+    }
+
+    /**
      * @return QueryWhereOrs|null
      */
     public function getWhereOr(): ?QueryWhereOrs

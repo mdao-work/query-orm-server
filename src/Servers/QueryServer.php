@@ -149,20 +149,19 @@ class QueryServer implements QueryServerContract, Arrayable
      * @param string $key
      * @return $this
      */
-    public function removeWhere(string $key): QueryServer
+    public function removeWhere($key): QueryServer
     {
-        if ($result = $this->ormEntity->getFilter()) {
+        $keys = is_array($key) ? $key : func_get_args();
 
-            $this->ormEntity->setFilter([]);
-
-            /**
-             * @var $item QueryWhere
-             */
-            foreach ($result as $index => $item) {
-                if ($index !== $key) {
-                    $this->where($item->getField(), $item->getOperator(), $item->getValue());
-                }
+        if ($queryWheres = $this->getQueryWheres()) {
+            dump($queryWheres);
+            foreach ($keys as $value) {
+                unset($queryWheres[$value]);
             }
+            dump('$queryWheres');
+            dump($queryWheres);
+            $this->ormEntity->resetFilter(empty($queryWheres) ? null : $queryWheres);
+            dump($this);
         }
         return $this;
     }
@@ -237,6 +236,8 @@ class QueryServer implements QueryServerContract, Arrayable
                 }
             }
         }
+
+
         return $this;
     }
 
@@ -273,6 +274,97 @@ class QueryServer implements QueryServerContract, Arrayable
     {
         $this->ormEntity->setPagination([$page, $pageSize]);
         return $this;
+    }
+
+    /**
+     * 判断where中是否存在某个输入值（参数）。如果存在， has 方法返回 true，否则返回 false
+     * @param string|array $key
+     * @return bool
+     */
+    public function hasWhereField($key): bool
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        if ($wheres = $this->getQueryWheres()) {
+            //检测是否存在
+            foreach ($keys as $value) {
+                if (is_null($wheres[$value]) || !isset($wheres[$value])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 判断where中是否存在某个输入值（参数）。如果存在， has 方法返回 true，否则返回 false
+     * @param string|array $key
+     * @return bool
+     */
+    public function hasWhereOrField($key): bool
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        if ($whereOrs = $this->getQueryWhereOrs()) {
+            //检测是否存在
+            foreach ($keys as $value) {
+                if (is_null($whereOrs[$value]) || !isset($whereOrs[$value])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 判断order中是否存在某个输入值（参数）。如果存在， has 方法返回 true，否则返回 false
+     * @param string|array $key
+     * @return bool
+     */
+    public function hasOrderField($key): bool
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        if ($orders = $this->getQueryOrderBy()) {
+            //检测是否存在
+            foreach ($keys as $value) {
+                if (is_null($orders[$value]) || !isset($orders[$value])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 判断select中是否存在某个输入值（参数）。如果存在， has 方法返回 true，否则返回 false
+     * @param string|array $key
+     * @return bool
+     */
+    public function hasSelect($key): bool
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        if ($querySelect = $this->getQuerySelect()) {
+
+            $selects = $querySelect->getKeys();
+
+            if (empty($selects)) {
+                return false;
+            }
+
+            //检测是否存在
+            foreach ($keys as $value) {
+                if (!in_array($value, $selects)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     /**

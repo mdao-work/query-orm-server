@@ -179,4 +179,26 @@ class WhereTest extends TestCase
             $this->assertEquals('=', $queryWhere->getOperator());
         }
     }
+
+    /**
+     * Json
+     * @throws ParserException
+     */
+    public function testAbnormal()
+    {
+        $data = [
+            'filter' => [
+                'field_1{eq}' => '0',
+            ],
+        ];
+
+        $queryServer = new QueryServer(OrmEntity::createEntity($data));
+        $queryWheres = $queryServer->getQueryWheres();
+
+        foreach ($queryWheres as  $queryWhere) {
+            $this->assertEquals('0', $queryWhere->getValue());
+            $this->assertEquals('field_1', $queryWhere->getField());
+            $this->assertEquals('=', $queryWhere->getOperator());
+        }
+    }
 }

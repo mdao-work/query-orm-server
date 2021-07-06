@@ -89,6 +89,7 @@ class QueryWheres implements \JsonSerializable, \ArrayAccess, \Iterator, \Counta
         }
 
         $list = [];
+
         /**
          * @var $queryWhere QueryWhere
          */
@@ -99,7 +100,6 @@ class QueryWheres implements \JsonSerializable, \ArrayAccess, \Iterator, \Counta
                 'value' => $queryWhere->getValue(),
             ];
         }
-
         return $list;
     }
 

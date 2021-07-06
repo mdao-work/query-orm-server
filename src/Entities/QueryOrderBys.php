@@ -13,7 +13,6 @@ class QueryOrderBys implements \JsonSerializable, \ArrayAccess, \Iterator, \Coun
     // 当前类名称
     protected $class;
 
-
     /**
      * 构造方法
      * @access public
@@ -54,7 +53,7 @@ class QueryOrderBys implements \JsonSerializable, \ArrayAccess, \Iterator, \Coun
      * @return mixed
      * @throws InvalidArgumentException
      */
-    public function getData($name = null): ?QueryWhere
+    public function getData($name = null): ?QueryOrderBy
     {
         if (is_null($name)) {
             return $this->data;
