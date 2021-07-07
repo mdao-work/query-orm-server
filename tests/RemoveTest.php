@@ -258,7 +258,7 @@ class RemoveTest extends TestCase
         $queryServer->removeSelect(['id']);
         $queryServer->removeSelect(['content']);
         $queryServer->removeSelect(['aa']);
-//        removeSelect
+        $this->assertEquals(null, $queryServer->getQueryOrderBy());
     }
 
 }
