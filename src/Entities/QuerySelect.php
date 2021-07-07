@@ -147,4 +147,25 @@ class QuerySelect implements Arrayable
 
         return empty($select) ? null : $select;
     }
+
+    /**
+     * @param string|array $key
+     */
+    public function remove($index)
+    {
+        $indexes = is_array($index) ? $index : func_get_args();
+
+        $keys = $this->getKeys();
+
+        foreach ($indexes as $key) {
+            $index = array_search($key, $keys);
+            if ($index !== false) {
+                unset($this->select[$index]);
+                //删除变名
+                if (isset($this->alias[$key])) {
+                    unset($this->alias[$key]);
+                }
+            }
+        }
+    }
 }

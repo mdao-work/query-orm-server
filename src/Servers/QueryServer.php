@@ -411,4 +411,37 @@ class QueryServer implements Arrayable
 
         return $result;
     }
+
+    /**
+     * 现在使用的是一个比较笨的方式，拿出所有的条件，然后再重新写入，以后优化
+     * @param string|array $key
+     * @return $this
+     */
+    public function removeSelect($key): self
+    {
+        if ($querySelects = $this->getQuerySelect()) {
+            $querySelects->remove($key);
+        }
+        return $this;
+    }
+
+
+    /**
+     * 移除order
+     * @param string|array $key
+     * @return $this
+     */
+    public function removeOrder($key): self
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        if ($queryOrderBy = $this->getQueryOrderBy()) {
+            foreach ($keys as $value) {
+                unset($queryOrderBy[$value]);
+            }
+            $this->ormEntity->resetOrder(empty($queryOrderBy) ? null : $queryOrderBy);
+        }
+        return $this;
+    }
+
 }

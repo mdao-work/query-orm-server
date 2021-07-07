@@ -162,4 +162,103 @@ class RemoveTest extends TestCase
         $this->assertEquals([], $queryServer3->getQueryWheres()->toArray());
 
     }
+
+    /**
+     * 测试order条件
+     * @throws \mdao\QueryOrmServer\Exception\ParserException
+     */
+    public function testRemoveOrder()
+    {
+        //url?order_by=id,type&sorted_by=desc,asc
+        $url = "https://www.baidu.com?order_by=field_1&sorted_by=desc";
+        //1.0 用parse_url解析URL
+        $data = parse_url($url);
+        parse_str($data['query'], $arrQuery);
+
+        //移除一个条件
+        $queryServer = new QueryServer(OrmEntity::createEntity($arrQuery));
+        $queryServer->removeOrder('field_1');
+        $this->assertEquals([], $queryServer->getQueryOrderBy()->toArray());
+
+
+        //url?order_by=id,type&sorted_by=desc,asc
+        $url = "https://www.baidu.com?order_by=field_1,field_2&sorted_by=desc,desc";
+        //1.0 用parse_url解析URL
+        $data2 = parse_url($url);
+        parse_str($data2['query'], $arrQuery2);
+
+        //移除多个条件
+        $queryServer2 = new QueryServer(OrmEntity::createEntity($arrQuery2));
+        $queryServer2->removeOrder('field_1', 'field_2');
+        $this->assertEquals([], $queryServer2->getQueryOrderBy()->toArray());
+
+        //url?order_by=id,type&sorted_by=desc,asc
+        $url = "https://www.baidu.com?order_by=field_1,field_2&sorted_by=desc,desc";
+        //1.0 用parse_url解析URL
+        $data5 = parse_url($url);
+        parse_str($data5['query'], $arrQuery5);
+
+        //移除所有条件后，然后新增条件
+        $queryServer5 = new QueryServer(OrmEntity::createEntity($arrQuery5));
+        $queryServer5->removeOrder('field_1');
+        $queryServer5->removeOrder('field_2');
+        $this->assertEquals([], $queryServer5->getQueryOrderBy()->toArray());
+
+        //新增一个
+        $queryServer5->orderBy('field_5', 'desc');
+
+        $this->assertEquals([
+            [
+                "field_5",
+                "desc"
+            ]
+        ], $queryServer5->getQueryOrderBy()->toArray());
+        $this->assertCount(1, $queryServer5->getQueryOrderBy()->toArray());
+
+        //新增第二个条件
+        $queryServer5->orderBy('field_6', 'asc');
+
+        $this->assertEquals([
+            [
+                "field_5",
+                "desc"
+            ],
+            [
+                "field_6",
+                "asc"
+            ],
+        ], $queryServer5->getQueryOrderBy()->toArray());
+
+        $this->assertCount(2, $queryServer5->getQueryOrderBy()->toArray());
+
+        //然后在移除一个条件
+        $queryServer5->removeOrder('field_5');
+
+        $this->assertEquals([
+            [
+                "field_6",
+                "asc"
+            ]
+        ], $queryServer5->getQueryOrderBy()->toArray());
+        $this->assertCount(1, $queryServer5->getQueryOrderBy()->toArray());
+    }
+
+    /**
+     * 测试移除select
+     * @throws \mdao\QueryOrmServer\Exception\ParserException
+     */
+    public function testRemoveSelect()
+    {
+        $url = "https://www.baidu.com?select=,id,date,content:text,aa:b,";
+        //1.0 用parse_url解析URL
+        $data = parse_url($url);
+        parse_str($data['query'], $arrQuery);
+
+        $queryServer = new QueryServer(OrmEntity::createEntity($arrQuery));
+        $queryServer->removeSelect(['id']);
+        $queryServer->removeSelect(['content']);
+        $queryServer->removeSelect(['aa']);
+//        removeSelect
+    }
+
 }

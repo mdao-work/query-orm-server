@@ -115,7 +115,7 @@ class OrmEntity
      * @param \mdao\QueryOrmServer\Entities\QueryWheres|null $queryWheres
      * @return $this
      */
-    public function resetFilter(?QueryWheres $queryWheres=null): self
+    public function resetFilter(?QueryWheres $queryWheres = null): self
     {
         $this->filter = $queryWheres;
         return $this;
@@ -155,6 +155,16 @@ class OrmEntity
     public function setOrder(array $order): self
     {
         $this->order = QueryOrderBys::create($order);
+        return $this;
+    }
+
+    /**
+     * @param \mdao\QueryOrmServer\Entities\QueryOrderBys|null $queryOrderBys
+     * @return $this
+     */
+    public function resetOrder(?QueryOrderBys $queryOrderBys = null): self
+    {
+        $this->order = $queryOrderBys;
         return $this;
     }
 
