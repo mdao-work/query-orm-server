@@ -21,7 +21,7 @@ use mdao\QueryOrmServer\Entities\QueryWhereTime;
 use mdao\QueryOrmServer\Exception\ParserException;
 
 
-class QueryServer implements QueryServerContract, Arrayable
+class QueryServer implements Arrayable
 {
     protected $ormEntity;
 
@@ -36,7 +36,7 @@ class QueryServer implements QueryServerContract, Arrayable
      * @return QueryServer
      * @throws ParserException
      */
-    public static function create(array $data = []): QueryServer
+    public static function create(array $data = []): self
     {
         return new static(OrmEntity::createEntity($data));
     }
@@ -74,7 +74,13 @@ class QueryServer implements QueryServerContract, Arrayable
     }
 
 
-    public function where($key, ?string $operation = null, $value = null): QueryServer
+    /**
+     * @param $key
+     * @param string|null $operation
+     * @param null $value
+     * @return $this
+     */
+    public function where($key, ?string $operation = null, $value = null): self
     {
         //批量数组模式
         if (is_array($key)) {
@@ -84,6 +90,11 @@ class QueryServer implements QueryServerContract, Arrayable
                 $this->ormEntity->addFilter($queryWhere);
             }
         } else {
+            //只传了两个参数时
+            if (is_null($value) && func_num_args() == 2) {
+                $value = $operation;
+                $operation = '=';
+            }
             $queryWhere = new QueryWhere($key, $operation, $value);
             $this->ormEntity->addFilter($queryWhere);
         }
@@ -95,7 +106,7 @@ class QueryServer implements QueryServerContract, Arrayable
      * @param array $value
      * @return $this
      */
-    public function whereIn(string $key, array $value): QueryServer
+    public function whereIn(string $key, array $value): self
     {
         $queryWhere = new QueryWhere($key, 'in', $value);
         $this->ormEntity->addFilter($queryWhere);
@@ -107,7 +118,7 @@ class QueryServer implements QueryServerContract, Arrayable
      * @param array $value
      * @return $this
      */
-    public function whereBetween(string $key, array $value): QueryServer
+    public function whereBetween(string $key, array $value): self
     {
         $queryWhere = new QueryWhere($key, 'between', $value);
         $this->ormEntity->addFilter($queryWhere);
@@ -119,7 +130,7 @@ class QueryServer implements QueryServerContract, Arrayable
      * @param array $value
      * @return $this
      */
-    public function whereNoBetween(string $key, array $value): QueryServer
+    public function whereNoBetween(string $key, array $value): self
     {
         $queryWhere = new QueryWhere($key, 'not between', $value);
         $this->ormEntity->addFilter($queryWhere);
@@ -133,7 +144,7 @@ class QueryServer implements QueryServerContract, Arrayable
      * @param string|null $endTime
      * @return $this
      */
-    public function whereBetweenTime(string $field, $startTime, ?string $endTime = null): QueryServer
+    public function whereBetweenTime(string $field, $startTime, ?string $endTime = null): self
     {
         if (is_null($endTime)) {
             $time = is_string($startTime) ? strtotime($startTime) : $startTime;
@@ -146,22 +157,18 @@ class QueryServer implements QueryServerContract, Arrayable
 
     /**
      * 现在使用的是一个比较笨的方式，拿出所有的条件，然后再重新写入，以后优化
-     * @param string $key
+     * @param string|array $key
      * @return $this
      */
-    public function removeWhere($key): QueryServer
+    public function removeWhere($key): self
     {
         $keys = is_array($key) ? $key : func_get_args();
 
         if ($queryWheres = $this->getQueryWheres()) {
-            dump($queryWheres);
             foreach ($keys as $value) {
                 unset($queryWheres[$value]);
             }
-            dump('$queryWheres');
-            dump($queryWheres);
             $this->ormEntity->resetFilter(empty($queryWheres) ? null : $queryWheres);
-            dump($this);
         }
         return $this;
     }
