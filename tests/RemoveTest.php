@@ -121,4 +121,45 @@ class RemoveTest extends TestCase
         ], $queryServer5->getQueryWheres()->toArray());
         $this->assertCount(1, $queryServer5->getQueryWheres()->toArray());
     }
+
+    /**
+     * 测试移除条件
+     * @throws \mdao\QueryOrmServer\Exception\ParserException
+     */
+    public function testRemoveWhereFields()
+    {
+        $data = [
+            'filter' => [
+                'field_1{eq}' => '=',
+            ],
+        ];
+
+        //移除一个条件
+        $queryServer = new QueryServer(OrmEntity::createEntity($data));
+        $queryServer->removeWhere('field_1');
+        $this->assertEquals([], $queryServer->getQueryWheres()->toArray());
+
+        $data2 = [
+            'filter' => [
+                'field_1{eq}' => '=',
+                'field_2{eq}' => '=',
+            ],
+        ];
+        //移除多个条件
+        $queryServer2 = new QueryServer(OrmEntity::createEntity($data2));
+        $queryServer2->removeWhere('field_1', 'field_2');
+        $this->assertEquals([], $queryServer2->getQueryWheres()->toArray());
+
+        $data3 = [
+            'filter' => [
+                'field_1{eq}' => '=',
+                'field_2{eq}' => '=',
+            ],
+        ];
+        //移除中间一个条件
+        $queryServer3 = new QueryServer(OrmEntity::createEntity($data3));
+        $queryServer3->removeWhere(['field_1', 'field_2']);
+        $this->assertEquals([], $queryServer3->getQueryWheres()->toArray());
+
+    }
 }
