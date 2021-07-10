@@ -31,8 +31,15 @@ class Parser
         $orderBy = $params[$config->getOrderBy()] ?? null;
         $sortedBy = $params[$config->getSortedBy()] ?? null;
         $order = null;
+        
         if (!is_null($orderBy) && !is_null($sortedBy) && $orderBy != '' && $sortedBy != '') {
-            $order = $this->order($orderBy, $sortedBy);
+            if (is_array($orderBy) && is_array($sortedBy)) {
+                foreach (array_combine($orderBy, $sortedBy) as $index => $item) {
+                    $order[] = [$index, $item];
+                }
+            } else {
+                $order = $this->order($orderBy, $sortedBy);
+            }
         }
 
         $page = $params[$config->getPage()] ?? null;
